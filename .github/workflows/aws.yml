@@ -1,0 +1,57 @@
+# Trigger deployment only on push to production branch
+
+name: Go Deploy to EC2 Instance
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to EC2 on production branch push
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Install dependencies
+        run: |
+          go version
+          go get -u golang.org/x/lint/golint
+
+      - name: Build
+        run: GOOS=linux GOARCH=amd64 go build app/http/main.go
+
+      - name: Test
+        run: go test -v ./...
+
+      - name: Copy binary to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_SSH_HOST_DNS }}
+          username: ${{ secrets.EC2_SSH_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "main"
+          target: "/home/ubuntu/app"
+
+      - name: Restart kora-app service
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_SSH_HOST_DNS }}
+          username: ${{ secrets.EC2_SSH_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: sudo service kora-app restart
+
+      - name: Send slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
