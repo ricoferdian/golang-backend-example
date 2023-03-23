@@ -10,7 +10,7 @@ type PostgresChoreoRepository struct {
 }
 
 func NewPostgresChoreoRepository(dbCli *sqlx.DB) choreo.ChoreoDatabaseRepo {
-	return PostgresChoreoRepository{
+	return &PostgresChoreoRepository{
 		dbCli: dbCli,
 	}
 }

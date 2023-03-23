@@ -10,7 +10,7 @@ type RedisChoreoRepository struct {
 }
 
 func NewRedisChoreoRepository(redisCli *redis.Client) choreo.ChoreoCacheRepo {
-	return RedisChoreoRepository{
+	return &RedisChoreoRepository{
 		redisCli: redisCli,
 	}
 }

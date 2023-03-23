@@ -10,7 +10,7 @@ type PostgresUserAuthRepository struct {
 }
 
 func NewPostgresUserAuthRepository(dbCli *sqlx.DB) auth.UserAuthDatabaseRepo {
-	return PostgresUserAuthRepository{
+	return &PostgresUserAuthRepository{
 		dbCli: dbCli,
 	}
 }

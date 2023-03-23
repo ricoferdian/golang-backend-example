@@ -27,6 +27,10 @@ type BaseRepositoryImpl struct {
 	config *helper.AppConfig
 }
 
+func (repo BaseRepositoryImpl) GetAppConfig() *helper.AppConfig {
+	return repo.config
+}
+
 func (repo BaseRepositoryImpl) ChoreoRepository() choreo.ChoreoRepository {
 	return repo.repo.choreoRepo
 }

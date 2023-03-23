@@ -14,7 +14,7 @@ type UserAuthUseCaseImpl struct {
 }
 
 func NewUserAuthUseCase(baseRepo common.BaseRepository, jwtModule *jwtauth.JwtAuthModule, cryptoModule *cryptography.CryptographyModule) auth.UserAuthUseCase {
-	return UserAuthUseCaseImpl{
+	return &UserAuthUseCaseImpl{
 		baseRepo:     baseRepo,
 		jwtModule:    jwtModule,
 		cryptoModule: cryptoModule,

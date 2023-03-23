@@ -10,7 +10,7 @@ type ChoreoUseCaseImpl struct {
 }
 
 func NewChoreoUseCase(baseRepo common.BaseRepository) choreo.ChoreoUseCase {
-	return ChoreoUseCaseImpl{
+	return &ChoreoUseCaseImpl{
 		baseRepo: baseRepo,
 	}
 }

@@ -23,7 +23,7 @@ func (r RedisUserAuthRepository) InsertSingleUser(ctx context.Context, entity en
 }
 
 func NewRedisUserAuthRepository(redisCli *redis.Client) auth.UserAuthCacheRepo {
-	return RedisUserAuthRepository{
+	return &RedisUserAuthRepository{
 		redisCli: redisCli,
 	}
 }

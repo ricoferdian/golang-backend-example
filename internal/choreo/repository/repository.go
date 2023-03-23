@@ -12,8 +12,8 @@ type ChoreoRepositoryImpl struct {
 func NewChoreoRepository(
 	dbRepo choreo.ChoreoDatabaseRepo,
 	redisRepo choreo.ChoreoCacheRepo,
-) ChoreoRepositoryImpl {
-	return ChoreoRepositoryImpl{
+) choreo.ChoreoRepository {
+	return &ChoreoRepositoryImpl{
 		dbRepo,
 		redisRepo,
 	}

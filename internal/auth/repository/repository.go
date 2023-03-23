@@ -11,7 +11,7 @@ func NewUserAuthRepository(
 	dbRepo auth.UserAuthDatabaseRepo,
 	redisRepo auth.UserAuthCacheRepo,
 ) auth.UserAuthRepository {
-	return UserAuthRepositoryImpl{
+	return &UserAuthRepositoryImpl{
 		dbRepo,
 		redisRepo,
 	}
