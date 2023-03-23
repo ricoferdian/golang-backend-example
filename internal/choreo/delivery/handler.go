@@ -13,8 +13,8 @@ const (
 
 func (api ChoreoHandler) RegisterPath(router *gin.Engine) {
 	router.OPTIONS(getChoreoList, api.middlewareM.CORS())
-	router.GET(getChoreoList, api.middlewareM.AuthHandlerMiddleware(api.getChoreoListHandler))
+	router.GET(getChoreoList, api.middlewareM.CommonHandlerMiddleware(api.getChoreoListHandler))
 
 	router.OPTIONS(getChoreoDetailList, api.middlewareM.CORS())
-	router.GET(getChoreoDetailList, api.middlewareM.AuthHandlerMiddleware(api.getChoreoDetailListHandler))
+	router.GET(getChoreoDetailList, api.middlewareM.CommonHandlerMiddleware(api.getChoreoDetailListHandler))
 }

@@ -22,8 +22,8 @@ func NewMiddlewareModule(jwtAuth *jwtauth.JwtAuthModule) *MiddlewareModule {
 }
 
 func (m *MiddlewareModule) AuthHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc {
-	startTime := time.Now()
 	return func(c *gin.Context) {
+		startTime := time.Now()
 		var (
 			bearerToken = c.Request.Header.Get("Authorization")
 		)

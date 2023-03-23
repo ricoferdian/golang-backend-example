@@ -19,9 +19,12 @@ func (c PostgresUserAuthRepository) InsertSingleUser(ctx context.Context, user e
 		return nil, err
 	}
 	defer userId.Close()
-	err = userId.Scan(
-		&user.UserID,
-	)
+	for userId.Next() {
+		err = userId.Scan(
+			&user.UserID,
+		)
+		break
+	}
 	result := helper.UserEntityToModel(user)
 
 	return &result, nil
