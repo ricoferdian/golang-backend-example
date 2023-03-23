@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"kora-backend/internal/choreo/helper"
 	"kora-backend/internal/entity"
 )
 
@@ -11,21 +12,7 @@ func (c ChoreoUseCaseImpl) GetChoreoDetailByChoreoID(ctx context.Context, filter
 		return choreoResult, err
 	}
 	for _, choreoData := range choreoList {
-		choreo := entity.ChoreographyDetailEntity{
-			ChoreoDetailID:       choreoData.ChoreoDetailID,
-			ChoreoID:             choreoData.ChoreoID.Int64,
-			ChoreoData:           nil,
-			Title:                choreoData.Title.String,
-			Duration:             choreoData.Duration.Float64,
-			IsActive:             choreoData.IsActive.Int32,
-			VideoURL:             choreoData.VideoURL.String,
-			VideoThumbnailURL:    choreoData.VideoThumbnailURL.String,
-			Order:                choreoData.Position.Int32,
-			VisionAngleThreshold: choreoData.VisionAngleThreshold.Float64,
-			VisionTimeOffset:     choreoData.VisionTimeOffset.Float64,
-			VisionBodyPose:       choreoData.VisionBodyPose.String,
-		}
-		choreoResult = append(choreoResult, choreo)
+		choreoResult = append(choreoResult, helper.ChoreoDetailToEntity(choreoData))
 	}
 	return choreoResult, nil
 }

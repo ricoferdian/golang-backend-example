@@ -7,10 +7,19 @@ import (
 const (
 	basePath = "/auth/user"
 
-	getUserProfile = basePath + "/profile"
+	authLogin    = basePath + "/login"
+	authRegister = basePath + "/register"
+
+	userProfile = basePath + "/profile"
 )
 
 func (api UserAuthHandler) RegisterPath(router *gin.Engine) {
-	router.OPTIONS(getUserProfile, api.middlewareM.CORS())
-	router.GET(getUserProfile, api.getUserProfile)
+	router.OPTIONS(authLogin, api.middlewareM.CORS())
+	router.POST(authLogin, api.authUserLoginHandler)
+
+	router.OPTIONS(authRegister, api.middlewareM.CORS())
+	router.POST(authRegister, api.authUserRegisterHandler)
+
+	router.OPTIONS(userProfile, api.middlewareM.CORS())
+	router.GET(userProfile, api.middlewareM.AuthHandlerMiddleware(api.userProfileHandler))
 }

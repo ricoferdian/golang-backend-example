@@ -12,6 +12,14 @@ type AppConfig struct {
 	DBConf         DatabaseConfig   `yaml:"database"`
 	RediConf       RedisConfig      `yaml:"redis"`
 	MonitoringConf MonitoringConfig `yaml:"monitoring"`
+	JWTConf        JWTConfig        `yaml:"jwt_auth"`
+}
+
+type JWTConfig struct {
+	HeaderKey      string `yaml:"header_key"`
+	ClaimIssuer    string `yaml:"claim_issuer"`
+	ClaimAudience  string `yaml:"claim_audience"`
+	ClaimExpirySec int    `yaml:"claim_expiry_sec"` // in seconds
 }
 
 type MonitoringConfig struct {

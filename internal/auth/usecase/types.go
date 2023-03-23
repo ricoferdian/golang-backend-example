@@ -1,16 +1,22 @@
 package usecase
 
 import (
-	"kora-backend/internal/domain/authdomain"
+	"kora-backend/internal/common/cryptography"
+	"kora-backend/internal/common/jwtauth"
+	"kora-backend/internal/domain/auth"
 	"kora-backend/internal/domain/common"
 )
 
 type UserAuthUseCaseImpl struct {
-	baseRepo common.BaseRepository
+	baseRepo     common.BaseRepository
+	jwtModule    *jwtauth.JwtAuthModule
+	cryptoModule *cryptography.CryptographyModule
 }
 
-func NewUserAuthUseCase(baseRepo common.BaseRepository) authdomain.UserAuthUseCase {
+func NewUserAuthUseCase(baseRepo common.BaseRepository, jwtModule *jwtauth.JwtAuthModule, cryptoModule *cryptography.CryptographyModule) auth.UserAuthUseCase {
 	return UserAuthUseCaseImpl{
-		baseRepo: baseRepo,
+		baseRepo:     baseRepo,
+		jwtModule:    jwtModule,
+		cryptoModule: cryptoModule,
 	}
 }

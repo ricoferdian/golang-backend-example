@@ -1,18 +1,18 @@
 package repository
 
-import "kora-backend/internal/domain/authdomain"
+import "kora-backend/internal/domain/auth"
 
 type UserAuthRepositoryImpl struct {
-	dbRepo    authdomain.UserAuthDatabaseRepo
-	redisRepo authdomain.UserAuthCacheRepo
+	auth.UserAuthDatabaseRepo
+	auth.UserAuthCacheRepo
 }
 
 func NewUserAuthRepository(
-	dbRepo authdomain.UserAuthDatabaseRepo,
-	redisRepo authdomain.UserAuthCacheRepo,
-) authdomain.UserAuthRepository {
+	dbRepo auth.UserAuthDatabaseRepo,
+	redisRepo auth.UserAuthCacheRepo,
+) auth.UserAuthRepository {
 	return UserAuthRepositoryImpl{
-		dbRepo:    dbRepo,
-		redisRepo: redisRepo,
+		dbRepo,
+		redisRepo,
 	}
 }

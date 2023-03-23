@@ -19,9 +19,11 @@ import (
 	postgres2 "kora-backend/internal/choreo/repository/postgres"
 	redis3 "kora-backend/internal/choreo/repository/redis"
 	usecase2 "kora-backend/internal/choreo/usecase"
+	"kora-backend/internal/common/cryptography"
+	"kora-backend/internal/common/jwtauth"
 	"kora-backend/internal/common/middleware"
 	"kora-backend/internal/common/repository"
-	"kora-backend/internal/domain/authdomain"
+	"kora-backend/internal/domain/auth"
 	"kora-backend/internal/domain/choreo"
 	"kora-backend/internal/domain/common"
 	"log"
@@ -33,7 +35,7 @@ var (
 )
 
 type AppUseCase struct {
-	authUC   authdomain.UserAuthUseCase
+	authUC   auth.UserAuthUseCase
 	choreoUC choreo.ChoreoUseCase
 }
 
@@ -42,10 +44,12 @@ type AppHandler struct {
 }
 
 type AppModule struct {
-	nrAgent     *newrelic.Application
-	middlewareM *middleware.MiddlewareModule
-	dbCli       *sqlx.DB
-	redisCli    *redis.Client
+	cryptoModule *cryptography.CryptographyModule
+	jwtModule    *jwtauth.JwtAuthModule
+	nrAgent      *newrelic.Application
+	middlewareM  *middleware.MiddlewareModule
+	dbCli        *sqlx.DB
+	redisCli     *redis.Client
 }
 
 func InitAppModule(cfg *helper.AppConfig) (appModule AppModule) {
@@ -59,7 +63,12 @@ func InitAppModule(cfg *helper.AppConfig) (appModule AppModule) {
 		log.Fatalf("Failed to init new relic with err : %s\n", err.Error())
 	}
 	appModule.nrAgent = newRelicAgent
-	appModule.middlewareM = middleware.InitMiddleware()
+	appModule.jwtModule, err = jwtauth.NewJwtAuthModule(cfg.JWTConf)
+	if err != nil {
+		log.Fatalf("Failed to init JWT auth module with err : %s\n", err.Error())
+	}
+	appModule.cryptoModule = cryptography.NewCryptographyModule()
+	appModule.middlewareM = middleware.NewMiddlewareModule(appModule.jwtModule)
 	appModule.dbCli = InitDBCLient(cfg.DBConf)
 	appModule.redisCli = InitRedisClient(cfg.RediConf)
 	return appModule
@@ -69,7 +78,7 @@ func InitRepository(module AppModule, config *helper.AppConfig) (appRepo common.
 	// Init user auth repo
 	userAuthRedisRepo := redis2.NewRedisUserAuthRepository(module.redisCli)
 	userAuthPostgresRepo := postgres.NewPostgresUserAuthRepository(module.dbCli)
-	authRepo := repository2.NewUserAuthRepository(userAuthRedisRepo, userAuthPostgresRepo)
+	authRepo := repository2.NewUserAuthRepository(userAuthPostgresRepo, userAuthRedisRepo)
 
 	// Init choreo repo
 	choreoPostgresrepo := postgres2.NewPostgresChoreoRepository(module.dbCli)
@@ -88,8 +97,8 @@ func InitHandler(useCase AppUseCase, appModule AppModule) (appHandler AppHandler
 	return appHandler
 }
 
-func InitAppUseCase(appRepo common.BaseRepository) (appUC AppUseCase) {
-	appUC.authUC = usecase.NewUserAuthUseCase(appRepo)
+func InitAppUseCase(appRepo common.BaseRepository, appModule AppModule) (appUC AppUseCase) {
+	appUC.authUC = usecase.NewUserAuthUseCase(appRepo, appModule.jwtModule, appModule.cryptoModule)
 	appUC.choreoUC = usecase2.NewChoreoUseCase(appRepo)
 	return appUC
 }
@@ -130,7 +139,7 @@ func main() {
 	log.Println("Initializing repository")
 	appRepo := InitRepository(appModule, cfg)
 	log.Println("Initializing usecase")
-	appUC := InitAppUseCase(appRepo)
+	appUC := InitAppUseCase(appRepo, appModule)
 	log.Println("Initializing handler")
 	appHandler := InitHandler(appUC, appModule)
 	log.Println("Initializing server")

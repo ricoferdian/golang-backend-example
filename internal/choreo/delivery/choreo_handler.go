@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (api ChoreoHandler) getChoreoList(c *gin.Context) {
+func (api ChoreoHandler) getChoreoListHandler(c *gin.Context) {
 	startTime := time.Now()
 	ctx := c.Request.Context()
 	data, err := api.choreoUC.GetChoreoList(ctx)

@@ -3,15 +3,25 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"kora-backend/app/helper/http"
+	"kora-backend/internal/common/constants"
+	"kora-backend/internal/common/jwtauth"
+	"strings"
 	"time"
 )
 
 // MiddlewareModule represent the data-struct for middleware
 type MiddlewareModule struct {
-	// another stuff , may be needed by middleware
+	jwtAuth *jwtauth.JwtAuthModule
 }
 
-func (m *MiddlewareModule) AuthenticatedHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc {
+// NewMiddlewareModule initialize the middleware
+func NewMiddlewareModule(jwtAuth *jwtauth.JwtAuthModule) *MiddlewareModule {
+	return &MiddlewareModule{
+		jwtAuth: jwtAuth,
+	}
+}
+
+func (m *MiddlewareModule) AuthHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc {
 	startTime := time.Now()
 	return func(c *gin.Context) {
 		var (
@@ -21,6 +31,25 @@ func (m *MiddlewareModule) AuthenticatedHandlerMiddleware(next gin.HandlerFunc) 
 			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
 			return
 		}
+		token := strings.SplitN(bearerToken, " ", 2)
+		if len(token) < 2 {
+			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
+			return
+		}
+		isValid, userEntity, err := m.jwtAuth.ValidateToken(token[1])
+		if err != nil {
+			if err.Error() == constants.ErrTokenExpired {
+				http.WriteErrorResponseByCode(c, startTime, http.StatusTokenExpired)
+				return
+			}
+			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
+			return
+		}
+		if !isValid {
+			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
+			return
+		}
+		c.Set(constants.CtxAuthUserData, userEntity)
 		next(c)
 	}
 }
@@ -45,9 +74,4 @@ func (m *MiddlewareModule) CORS() gin.HandlerFunc {
 
 		c.Next()
 	}
-}
-
-// InitMiddleware initialize the middleware
-func InitMiddleware() *MiddlewareModule {
-	return &MiddlewareModule{}
 }

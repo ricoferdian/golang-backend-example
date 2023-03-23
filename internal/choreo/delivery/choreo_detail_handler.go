@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (api ChoreoHandler) getChoreoDetailList(c *gin.Context) {
+func (api ChoreoHandler) getChoreoDetailListHandler(c *gin.Context) {
 	startTime := time.Now()
 	ctx := c.Request.Context()
 	choreoId, err := strconv.Atoi(c.Request.URL.Query().Get("choreo_id"))

@@ -2,18 +2,18 @@ package repository
 
 import (
 	"kora-backend/app/helper"
-	"kora-backend/internal/domain/authdomain"
+	"kora-backend/internal/domain/auth"
 	"kora-backend/internal/domain/choreo"
 	"kora-backend/internal/domain/common"
 )
 
 type Repository struct {
-	userAuthRepo authdomain.UserAuthRepository
+	userAuthRepo auth.UserAuthRepository
 	choreoRepo   choreo.ChoreoRepository
 }
 
 func NewRepository(
-	userAuthRepo authdomain.UserAuthRepository,
+	userAuthRepo auth.UserAuthRepository,
 	choreoRepo choreo.ChoreoRepository,
 ) Repository {
 	return Repository{
@@ -31,7 +31,7 @@ func (repo BaseRepositoryImpl) ChoreoRepository() choreo.ChoreoRepository {
 	return repo.repo.choreoRepo
 }
 
-func (repo BaseRepositoryImpl) UserAuthRepository() authdomain.UserAuthRepository {
+func (repo BaseRepositoryImpl) UserAuthRepository() auth.UserAuthRepository {
 	return repo.repo.userAuthRepo
 }
 

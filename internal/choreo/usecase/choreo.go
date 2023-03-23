@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"kora-backend/internal/choreo/helper"
 	"kora-backend/internal/entity"
 )
 
@@ -11,22 +12,7 @@ func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) (choreoResult []en
 		return choreoResult, err
 	}
 	for _, choreoData := range choreoList {
-		choreo := entity.ChoreographyEntity{
-			ChoreoID:          choreoData.ChoreoID,
-			Title:             choreoData.Title.String,
-			Description:       choreoData.Description.String,
-			Difficulty:        choreoData.Difficulty.Int32,
-			Duration:          choreoData.Duration.Float64,
-			IsActive:          choreoData.IsActive.Int32,
-			VideoPreviewURL:   choreoData.VideoPreviewURL.String,
-			VideoThumbnailURL: choreoData.VideoThumbnailURL.String,
-			ChoreographerID:   choreoData.ChoreographerID.Int64,
-			MusicID:           choreoData.MusicID.Int64,
-			Order:             choreoData.Position.Int32,
-			ChoreographerData: nil,
-			MusicData:         nil,
-		}
-		choreoResult = append(choreoResult, choreo)
+		choreoResult = append(choreoResult, helper.ChoreoModelToEntity(choreoData))
 	}
 	return choreoResult, nil
 }
