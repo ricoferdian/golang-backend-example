@@ -25,6 +25,7 @@ import (
 	"kora-backend/internal/common/jwtauth"
 	"kora-backend/internal/common/middleware"
 	"kora-backend/internal/common/repository"
+	"kora-backend/internal/common/slackwebhook"
 	"kora-backend/internal/domain/auth"
 	"kora-backend/internal/domain/choreo"
 	"kora-backend/internal/domain/common"
@@ -48,6 +49,7 @@ type AppHandler struct {
 }
 
 type AppModule struct {
+	slackModule  *slackwebhook.SlackWebhookModule
 	cryptoModule *cryptography.CryptographyModule
 	jwtModule    *jwtauth.JwtAuthModule
 	nrAgent      *newrelic.Application
@@ -67,6 +69,10 @@ func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
 		log.Fatalf("Failed to init new relic with err : %s\n", err.Error())
 	}
 	appModule = &AppModule{}
+	appModule.slackModule, err = slackwebhook.NewSlackWebhookModule()
+	if err != nil {
+		log.Println("Failed to init slack module")
+	}
 	appModule.nrAgent = newRelicAgent
 	appModule.jwtModule, err = jwtauth.NewJwtAuthModule(cfg.JWTConf)
 	if err != nil {
@@ -151,6 +157,7 @@ func main() {
 	cfg := helper.InitConfig(appName)
 	log.Println("Initializing modules")
 	appModule := InitAppModule(cfg)
+	_ = helper.SendServiceStartAlert(appModule.slackModule)
 	log.Println("Initializing repository")
 	appRepo := InitRepository(appModule, cfg)
 	log.Println("Initializing usecase")

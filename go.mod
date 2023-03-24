@@ -1,6 +1,6 @@
 module kora-backend
 
-go 1.20
+go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.9.0
@@ -10,6 +10,8 @@ require (
 	github.com/newrelic/go-agent/v3 v3.20.4
 	github.com/newrelic/go-agent/v3/integrations/nrgin v1.1.3
 	github.com/redis/go-redis/v9 v9.0.2
+	golang.org/x/crypto v0.7.0
+	golang.org/x/sync v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -35,9 +37,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
