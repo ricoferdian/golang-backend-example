@@ -19,6 +19,8 @@ import (
 	postgres2 "kora-backend/internal/choreo/repository/postgres"
 	redis3 "kora-backend/internal/choreo/repository/redis"
 	usecase2 "kora-backend/internal/choreo/usecase"
+	repository5 "kora-backend/internal/choreographer/repository"
+	postgres4 "kora-backend/internal/choreographer/repository/postgres"
 	"kora-backend/internal/common/cryptography"
 	"kora-backend/internal/common/jwtauth"
 	"kora-backend/internal/common/middleware"
@@ -26,6 +28,8 @@ import (
 	"kora-backend/internal/domain/auth"
 	"kora-backend/internal/domain/choreo"
 	"kora-backend/internal/domain/common"
+	repository4 "kora-backend/internal/music/repository"
+	postgres3 "kora-backend/internal/music/repository/postgres"
 	"log"
 	"net/http"
 )
@@ -80,13 +84,21 @@ func InitRepository(module AppModule, config *helper.AppConfig) (appRepo common.
 	userAuthPostgresRepo := postgres.NewPostgresUserAuthRepository(module.dbCli)
 	authRepo := repository2.NewUserAuthRepository(userAuthPostgresRepo, userAuthRedisRepo)
 
+	// Init music repo
+	musicPostgresRepo := postgres3.NewPostgresMusicRepository(module.dbCli)
+	musicRepo := repository4.NewMusicRepository(musicPostgresRepo, nil)
+
+	// Init choreographer repo
+	choreographPostgresRepo := postgres4.NewPostgresChoreographerRepository(module.dbCli)
+	choreographRepo := repository5.NewChoreographerRepository(choreographPostgresRepo, nil)
+
 	// Init choreo repo
 	choreoPostgresrepo := postgres2.NewPostgresChoreoRepository(module.dbCli)
 	choreoRedisRepo := redis3.NewRedisChoreoRepository(module.redisCli)
 	choreoRepo := repository3.NewChoreoRepository(choreoPostgresrepo, choreoRedisRepo)
 
 	// Init base repo
-	repoDS := repository.NewRepository(authRepo, choreoRepo)
+	repoDS := repository.NewRepository(authRepo, choreoRepo, musicRepo, choreographRepo)
 	appRepo = repository.NewBaseRepository(repoDS, config)
 	return appRepo
 }

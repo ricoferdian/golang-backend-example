@@ -11,6 +11,7 @@ func (api ChoreoHandler) getChoreoListHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 	data, err := api.choreoUC.GetChoreoList(ctx)
 	if err != nil {
+		http.WriteErrorResponseByCode(c, startTime, http.StatusNotFound)
 		return
 	}
 	http.WriteSuccessResponse(c, startTime, data)

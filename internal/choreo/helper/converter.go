@@ -5,6 +5,20 @@ import (
 	"kora-backend/internal/model"
 )
 
+func MusicModelToEntity(musicModel model.MusicModel) entity.MusicEntity {
+	return entity.MusicEntity{
+		MusicID:    musicModel.MusicID,
+		ArtistName: musicModel.ArtistName,
+		Title:      musicModel.Title,
+	}
+}
+func ChoreographerModelToEntity(musicModel model.ChoreographerModel) entity.ChoreographerEntity {
+	return entity.ChoreographerEntity{
+		ChoreographerID:   musicModel.ChoreographerID,
+		ChoreographerName: musicModel.ChoreographerName,
+	}
+}
+
 func ChoreoModelToEntity(model model.ChoreographyModel) entity.ChoreographyEntity {
 	return entity.ChoreographyEntity{
 		ChoreoID:          model.ChoreoID,

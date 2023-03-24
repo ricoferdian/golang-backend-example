@@ -7,12 +7,20 @@ import (
 	"kora-backend/internal/model"
 )
 
-func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []model.ChoreographyModel, err error) {
+func (c PostgresChoreoRepository) getChoreoListRows(ctx context.Context) (rows *sql.Rows, err error) {
 	query, args := c.buildGetChoreoList()
-	rows, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
+	rows, err = c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
 	if err == sql.ErrNoRows {
-		return result, nil
+		return nil, nil
 	}
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []model.ChoreographyModel, err error) {
+	rows, err := c.getChoreoListRows(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -25,6 +33,33 @@ func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []m
 		result = append(result, choreoData)
 	}
 	return result, nil
+}
+
+func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx context.Context) (result []model.ChoreographyModel, musicIds []int64, choreographerIds []int64, err error) {
+	rows, err := c.getChoreoListRows(ctx)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	defer rows.Close()
+
+	var musicIdExist = make(map[int64]bool)
+	var cgpherIdExist = make(map[int64]bool)
+	for rows.Next() {
+		choreoData, musicId, cgpherId, err := c.scanChoreoDataWithRelatedIds(rows)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		if musicId != 0 && !musicIdExist[musicId] {
+			musicIds = append(musicIds, musicId)
+			musicIdExist[musicId] = true
+		}
+		if cgpherId != 0 && !cgpherIdExist[cgpherId] {
+			choreographerIds = append(choreographerIds, cgpherId)
+			cgpherIdExist[cgpherId] = true
+		}
+		result = append(result, choreoData)
+	}
+	return result, musicIds, choreographerIds, nil
 }
 
 func (c PostgresChoreoRepository) buildGetChoreoList() (string, []interface{}) {
@@ -51,4 +86,10 @@ func (c PostgresChoreoRepository) scanChoreoData(row *sql.Rows) (result model.Ch
 	)
 
 	return result, err
+}
+
+func (c PostgresChoreoRepository) scanChoreoDataWithRelatedIds(row *sql.Rows) (result model.ChoreographyModel, musicId int64, cgpherId int64, err error) {
+	result, err = c.scanChoreoData(row)
+
+	return result, result.MusicID.Int64, result.ChoreographerID.Int64, err
 }

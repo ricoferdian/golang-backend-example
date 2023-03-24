@@ -12,7 +12,7 @@ func (c PostgresChoreoRepository) GetChoreoDetailByChoreoID(ctx context.Context,
 	query, args := c.buildGetChoreoDetailByChoreoID(filter)
 	rows, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
 	if err == sql.ErrNoRows {
-		return result, nil
+		return nil, nil
 	}
 	if err != nil {
 		return nil, err
