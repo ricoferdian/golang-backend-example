@@ -56,7 +56,7 @@ type AppModule struct {
 	redisCli     *redis.Client
 }
 
-func InitAppModule(cfg *helper.AppConfig) (appModule AppModule) {
+func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
 	newRelicAgent, err := newrelic.NewApplication(
 		newrelic.ConfigAppName(fmt.Sprintf("%s-application", appName)),
 		newrelic.ConfigLicense(cfg.MonitoringConf.NewRelicKey),
@@ -66,6 +66,7 @@ func InitAppModule(cfg *helper.AppConfig) (appModule AppModule) {
 	if err != nil {
 		log.Fatalf("Failed to init new relic with err : %s\n", err.Error())
 	}
+	appModule = &AppModule{}
 	appModule.nrAgent = newRelicAgent
 	appModule.jwtModule, err = jwtauth.NewJwtAuthModule(cfg.JWTConf)
 	if err != nil {
@@ -78,7 +79,7 @@ func InitAppModule(cfg *helper.AppConfig) (appModule AppModule) {
 	return appModule
 }
 
-func InitRepository(module AppModule, config *helper.AppConfig) (appRepo common.BaseRepository) {
+func InitRepository(module *AppModule, config *helper.AppConfig) (appRepo common.BaseRepository) {
 	// Init user auth repo
 	userAuthRedisRepo := redis2.NewRedisUserAuthRepository(module.redisCli)
 	userAuthPostgresRepo := postgres.NewPostgresUserAuthRepository(module.dbCli)
@@ -103,19 +104,21 @@ func InitRepository(module AppModule, config *helper.AppConfig) (appRepo common.
 	return appRepo
 }
 
-func InitHandler(useCase AppUseCase, appModule AppModule) (appHandler AppHandler) {
-	appHandler.handlers = append(appHandler.handlers, delivery.NewUserAuthHandler(appModule.middlewareM, useCase.authUC))
-	appHandler.handlers = append(appHandler.handlers, delivery2.NewChoreoHandler(appModule.middlewareM, useCase.choreoUC))
+func InitHandler(useCase *AppUseCase, appModule *AppModule, config *helper.AppConfig) (appHandler *AppHandler) {
+	appHandler = &AppHandler{}
+	appHandler.handlers = append(appHandler.handlers, delivery.NewUserAuthHandler(appModule.middlewareM, config.HandlerConf, useCase.authUC))
+	appHandler.handlers = append(appHandler.handlers, delivery2.NewChoreoHandler(appModule.middlewareM, config.HandlerConf, useCase.choreoUC))
 	return appHandler
 }
 
-func InitAppUseCase(appRepo common.BaseRepository, appModule AppModule) (appUC AppUseCase) {
+func InitAppUseCase(appRepo common.BaseRepository, appModule *AppModule) (appUC *AppUseCase) {
+	appUC = &AppUseCase{}
 	appUC.authUC = usecase.NewUserAuthUseCase(appRepo, appModule.jwtModule, appModule.cryptoModule)
 	appUC.choreoUC = usecase2.NewChoreoUseCase(appRepo)
 	return appUC
 }
 
-func InitDBCLient(cfg helper.DatabaseConfig) (cli *sqlx.DB) {
+func InitDBCLient(cfg *helper.DatabaseConfig) (cli *sqlx.DB) {
 	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s", cfg.DriverName, cfg.Username, cfg.Password, cfg.Hostname, cfg.Port, cfg.DBName)
 	cli, err := sqlx.Connect(
 		cfg.DriverName,
@@ -127,14 +130,14 @@ func InitDBCLient(cfg helper.DatabaseConfig) (cli *sqlx.DB) {
 	return cli
 }
 
-func InitRedisClient(cfg helper.RedisConfig) (cli *redis.Client) {
+func InitRedisClient(cfg *helper.RedisConfig) (cli *redis.Client) {
 	return redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port),
 		DB:   0, // use default DB
 	})
 }
 
-func InitRouter(appHandler AppHandler, appModule AppModule) (router *gin.Engine) {
+func InitRouter(appHandler *AppHandler, appModule *AppModule) (router *gin.Engine) {
 	router = gin.Default()
 	router.Use(nrgin.Middleware(appModule.nrAgent))
 	for _, handler := range appHandler.handlers {
@@ -153,7 +156,7 @@ func main() {
 	log.Println("Initializing usecase")
 	appUC := InitAppUseCase(appRepo, appModule)
 	log.Println("Initializing handler")
-	appHandler := InitHandler(appUC, appModule)
+	appHandler := InitHandler(appUC, appModule, cfg)
 	log.Println("Initializing server")
 	router := InitRouter(appHandler, appModule)
 	log.Println("App successfully initialized")

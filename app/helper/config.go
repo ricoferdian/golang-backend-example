@@ -8,11 +8,12 @@ import (
 )
 
 type AppConfig struct {
-	ServerConf     ServerConfig     `yaml:"http_server"`
-	DBConf         DatabaseConfig   `yaml:"database"`
-	RediConf       RedisConfig      `yaml:"redis"`
-	MonitoringConf MonitoringConfig `yaml:"monitoring"`
-	JWTConf        JWTConfig        `yaml:"jwt_auth"`
+	ServerConf     *ServerConfig     `yaml:"http_server"`
+	HandlerConf    *HandlerConfig    `yaml:"http_handler"`
+	DBConf         *DatabaseConfig   `yaml:"database"`
+	RediConf       *RedisConfig      `yaml:"redis"`
+	MonitoringConf *MonitoringConfig `yaml:"monitoring"`
+	JWTConf        *JWTConfig        `yaml:"jwt_auth"`
 }
 
 type JWTConfig struct {
@@ -30,6 +31,10 @@ type MonitoringConfig struct {
 
 type ServerConfig struct {
 	Port string `yaml:"port"`
+}
+
+type HandlerConfig struct {
+	Timeout int `yaml:"timeout"`
 }
 
 type DatabaseConfig struct {

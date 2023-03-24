@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"kora-backend/app/helper/http"
 	"kora-backend/internal/common/constants"
@@ -9,6 +10,9 @@ import (
 )
 
 func (api UserAuthHandler) userProfileHandler(c *gin.Context) {
+	_, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
+	defer cancel()
+
 	startTime := time.Now()
 	data, isOk := c.Value(constants.CtxAuthUserData).(*entity.AuthenticatedUserEntity)
 	if !isOk {

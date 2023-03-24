@@ -5,7 +5,7 @@ import (
 )
 
 type JwtAuthModule struct {
-	config    helper.JWTConfig
+	config    *helper.JWTConfig
 	secretKey string
 }
 
@@ -24,7 +24,7 @@ type JWTUserPayload struct {
 	UserType     int16  `json:"user_type"`
 }
 
-func NewJwtAuthModule(config helper.JWTConfig) (*JwtAuthModule, error) {
+func NewJwtAuthModule(config *helper.JWTConfig) (*JwtAuthModule, error) {
 	secretKey, err := getSecretEnv()
 	if err != nil {
 		return nil, err

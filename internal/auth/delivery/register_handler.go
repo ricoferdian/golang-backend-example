@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"kora-backend/app/helper/http"
@@ -36,9 +37,10 @@ func validateRegisterParam(c *gin.Context) (*entity.UserEntity, error) {
 }
 
 func (api UserAuthHandler) authUserRegisterHandler(c *gin.Context) {
-	startTime := time.Now()
-	ctx := c.Request.Context()
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
+	defer cancel()
 
+	startTime := time.Now()
 	userData, err := validateRegisterParam(c)
 	if err != nil {
 		http.WriteErrorResponseByCode(c, startTime, http.StatusInvalidRequest)
