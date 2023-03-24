@@ -8,7 +8,7 @@ import (
 	"kora-backend/internal/model"
 )
 
-func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]*entity.ChoreographyEntity, error) {
+func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]entity.ChoreographyEntity, error) {
 	choreoList, musicIds, cgpherIds, err := c.baseRepo.ChoreoRepository().GetChoreoListWithMusicAndChoreographIds(ctx)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]*entity.Choreog
 	musicMap := <-musicMapCh
 
 	// Construct response
-	var choreoResult []*entity.ChoreographyEntity
+	var choreoResult []entity.ChoreographyEntity
 	for _, choreoData := range choreoList {
 		// Convert to entity
 		choreoEntity := helper.ChoreoModelToEntity(choreoData)
@@ -75,7 +75,7 @@ func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]*entity.Choreog
 		}
 
 		// Append to result
-		choreoResult = append(choreoResult, &choreoEntity)
+		choreoResult = append(choreoResult, choreoEntity)
 	}
 	return choreoResult, nil
 }
