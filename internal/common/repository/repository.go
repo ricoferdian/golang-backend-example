@@ -6,14 +6,16 @@ import (
 	"kora-backend/internal/domain/choreo"
 	"kora-backend/internal/domain/choreographer"
 	"kora-backend/internal/domain/common"
+	"kora-backend/internal/domain/learning_history"
 	"kora-backend/internal/domain/music"
 )
 
 type Repository struct {
-	userAuthRepo      auth.UserAuthRepository
-	choreoRepo        choreo.ChoreoRepository
-	musicRepo         music.MusicRepository
-	choreographerRepo choreographer.ChoreographerRepository
+	userAuthRepo        auth.UserAuthRepository
+	choreoRepo          choreo.ChoreoRepository
+	musicRepo           music.MusicRepository
+	choreographerRepo   choreographer.ChoreographerRepository
+	learningHistoryRepo learning_history.LearningHistoryRepository
 }
 
 func NewRepository(
@@ -21,12 +23,14 @@ func NewRepository(
 	choreoRepo choreo.ChoreoRepository,
 	musicRepo music.MusicRepository,
 	choreographerRepo choreographer.ChoreographerRepository,
+	learningHistoryRepo learning_history.LearningHistoryRepository,
 ) Repository {
 	return Repository{
-		userAuthRepo:      userAuthRepo,
-		choreoRepo:        choreoRepo,
-		musicRepo:         musicRepo,
-		choreographerRepo: choreographerRepo,
+		userAuthRepo:        userAuthRepo,
+		choreoRepo:          choreoRepo,
+		musicRepo:           musicRepo,
+		choreographerRepo:   choreographerRepo,
+		learningHistoryRepo: learningHistoryRepo,
 	}
 }
 
@@ -53,6 +57,10 @@ func (repo BaseRepositoryImpl) ChoreoRepository() choreo.ChoreoRepository {
 
 func (repo BaseRepositoryImpl) UserAuthRepository() auth.UserAuthRepository {
 	return repo.repo.userAuthRepo
+}
+
+func (repo BaseRepositoryImpl) LearningHistoryRepository() learning_history.LearningHistoryRepository {
+	return repo.repo.learningHistoryRepo
 }
 
 func NewBaseRepository(

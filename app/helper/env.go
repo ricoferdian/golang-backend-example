@@ -22,3 +22,11 @@ func GetConfigPath(env string) string {
 	}
 	return "/home/ubuntu/app/files/etc/config"
 }
+
+func GetHostname() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "unknown-hostname"
+	}
+	return hostname
+}

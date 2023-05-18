@@ -1,13 +1,14 @@
 package helper
 
 import (
+	"errors"
 	slack "kora-backend/internal/common/slackwebhook"
 	"os"
 )
 
 func SendServiceStartAlert(slackModule *slack.SlackWebhookModule) error {
 	attachment1 := slack.Attachment{}
-	attachment1.AddField(slack.Field{Title: "Hostname", Value: getHostname()})
+	attachment1.AddField(slack.Field{Title: "Hostname", Value: GetHostname()})
 	payload := slack.Payload{
 		Text:        "Service is starting",
 		Attachments: []slack.Attachment{attachment1},
@@ -21,7 +22,7 @@ func SendServiceStartAlert(slackModule *slack.SlackWebhookModule) error {
 
 func SendServiceFailureAlert(slackModule *slack.SlackWebhookModule, errMsg error) error {
 	attachment1 := slack.Attachment{}
-	attachment1.AddField(slack.Field{Title: "Hostname", Value: getHostname()})
+	attachment1.AddField(slack.Field{Title: "Hostname", Value: GetHostname()})
 	attachment1.AddField(slack.Field{Title: "Cause", Value: errMsg.Error()})
 	payload := slack.Payload{
 		Text:        "Service is has been stopped",
@@ -34,10 +35,11 @@ func SendServiceFailureAlert(slackModule *slack.SlackWebhookModule, errMsg error
 	return nil
 }
 
-func getHostname() string {
-	hostname, err := os.Hostname()
-	if err != nil {
-		return "unknown-hostname"
+// getSecretEnv used to get jwt secret key from environment variable.
+func GetSlackWebhookAlertUrl() (string, error) {
+	env := os.Getenv("ALERT_SLACK_WEBHOOK_URL")
+	if env == "" {
+		return "", errors.New("unable to get slack webhook URL")
 	}
-	return hostname
+	return env, nil
 }
