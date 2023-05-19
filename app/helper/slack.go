@@ -1,7 +1,9 @@
 package helper
 
 import (
+	"errors"
 	slack "kora-backend/internal/common/slackwebhook"
+	"os"
 )
 
 func SendServiceStartAlert(slackModule *slack.SlackWebhookModule) error {
@@ -35,10 +37,9 @@ func SendServiceFailureAlert(slackModule *slack.SlackWebhookModule, errMsg error
 
 // getSecretEnv used to get jwt secret key from environment variable.
 func GetSlackWebhookAlertUrl() (string, error) {
-	return "123", nil
-	//env := os.Getenv("ALERT_SLACK_WEBHOOK_URL")
-	//if env == "" {
-	//	return "", errors.New("unable to get slack webhook URL")
-	//}
-	//return env, nil
+	env := os.Getenv("ALERT_SLACK_WEBHOOK_URL")
+	if env == "" {
+		return "", errors.New("unable to get slack webhook URL")
+	}
+	return env, nil
 }
