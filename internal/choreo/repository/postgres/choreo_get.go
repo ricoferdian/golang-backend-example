@@ -19,6 +19,26 @@ func (c PostgresChoreoRepository) getChoreoListRows(ctx context.Context) (rows *
 	return rows, nil
 }
 
+func (c PostgresChoreoRepository) GetChoreoById(ctx context.Context, choreoID int64) (result *model.ChoreographyModel, err error) {
+	query, args := c.buildGetChoreoByID(choreoID)
+	rows, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		choreoData, err := c.scanChoreoData(rows)
+		if err != nil {
+			return nil, err
+		}
+		return &choreoData, nil
+	}
+	return nil, nil
+}
+
 func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []model.ChoreographyModel, err error) {
 	rows, err := c.getChoreoListRows(ctx)
 	if err != nil {
@@ -35,10 +55,10 @@ func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []m
 	return result, nil
 }
 
-func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx context.Context) (result []model.ChoreographyModel, musicIds []int64, choreographerIds []int64, err error) {
+func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx context.Context) (result []model.ChoreographyModel, choreoIds []int64, musicIds []int64, choreographerIds []int64, err error) {
 	rows, err := c.getChoreoListRows(ctx)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	defer rows.Close()
 
@@ -47,7 +67,7 @@ func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx co
 	for rows.Next() {
 		choreoData, musicId, cgpherId, err := c.scanChoreoDataWithRelatedIds(rows)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		if musicId != 0 && !musicIdExist[musicId] {
 			musicIds = append(musicIds, musicId)
@@ -57,15 +77,25 @@ func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx co
 			choreographerIds = append(choreographerIds, cgpherId)
 			cgpherIdExist[cgpherId] = true
 		}
+		choreoIds = append(choreoIds, choreoData.ChoreoID)
 		result = append(result, choreoData)
 	}
-	return result, musicIds, choreographerIds, nil
+	return result, choreoIds, musicIds, choreographerIds, nil
 }
 
 func (c PostgresChoreoRepository) buildGetChoreoList() (string, []interface{}) {
 	sb := sq.NewSelectBuilder()
 	sb.Select(columnSelectAllChoreo)
 	sb.From(tableMasterChoreo)
+
+	return sb.Build()
+}
+
+func (c PostgresChoreoRepository) buildGetChoreoByID(choreoID int64) (string, []interface{}) {
+	sb := sq.NewSelectBuilder()
+	sb.Select(columnSelectAllChoreo)
+	sb.From(tableMasterChoreo)
+	sb.Where(sb.Equal("choreo_id", choreoID))
 
 	return sb.Build()
 }
@@ -83,6 +113,7 @@ func (c PostgresChoreoRepository) scanChoreoData(row *sql.Rows) (result model.Ch
 		&result.VideoThumbnailURL,
 		&result.ChoreographerID,
 		&result.MusicID,
+		&result.TempPrice,
 	)
 
 	return result, err

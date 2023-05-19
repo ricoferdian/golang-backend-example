@@ -6,10 +6,11 @@ import (
 	"kora-backend/internal/choreo/helper"
 	"kora-backend/internal/entity"
 	"kora-backend/internal/model"
+	"strconv"
 )
 
 func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]entity.ChoreographyEntity, error) {
-	choreoList, musicIds, cgpherIds, err := c.baseRepo.ChoreoRepository().GetChoreoListWithMusicAndChoreographIds(ctx)
+	choreoList, _, musicIds, cgpherIds, err := c.baseRepo.ChoreoRepository().GetChoreoListWithMusicAndChoreographIds(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +64,8 @@ func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]entity.Choreogr
 	for _, choreoData := range choreoList {
 		// Convert to entity
 		choreoEntity := helper.ChoreoModelToEntity(choreoData)
+		choreoEntity.Unlocked = c.checkContentUnlockStatus(choreoData)
+		choreoEntity.CurrentPrice = strconv.FormatInt(choreoData.TempPrice.Int64, 10)
 
 		// Retrieve data from model
 		if data, ok := cgpherMap[choreoEntity.ChoreographerID]; ok {
@@ -72,6 +75,102 @@ func (c ChoreoUseCaseImpl) GetChoreoList(ctx context.Context) ([]entity.Choreogr
 		if data, ok := musicMap[choreoEntity.MusicID]; ok {
 			music := helper.MusicModelToEntity(data)
 			choreoEntity.MusicData = &music
+		}
+
+		// Append to result
+		choreoResult = append(choreoResult, choreoEntity)
+	}
+	return choreoResult, nil
+}
+
+func (c ChoreoUseCaseImpl) GetChoreoListWithUserContent(ctx context.Context, userID int64) ([]entity.ChoreographyEntity, error) {
+	choreoList, _, musicIds, cgpherIds, err := c.baseRepo.ChoreoRepository().GetChoreoListWithMusicAndChoreographIds(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get detail data from choreo list retrieved using goroutine
+	musicMapCh := make(chan map[int64]model.MusicModel, 1)
+	cgpherMapCh := make(chan map[int64]model.ChoreographerModel, 1)
+	purchaseMapCh := make(chan map[int64]model.ChoreoPurchaseModel, 1)
+	g, errCtx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		defer close(musicMapCh)
+		musicMap, err := c.baseRepo.MusicRepository().GetMusicByIdsMap(errCtx, musicIds)
+		if err != nil {
+			return err
+		}
+		if len(musicMap) == 0 {
+			return nil
+		}
+		select {
+		case musicMapCh <- musicMap:
+		case <-errCtx.Done():
+			return errCtx.Err()
+		}
+		return nil
+	})
+	g.Go(func() error {
+		defer close(cgpherMapCh)
+		cgpherMap, err := c.baseRepo.ChoreographerRepository().GetChoreographerByIdsMap(errCtx, cgpherIds)
+		if err != nil {
+			return err
+		}
+		if len(cgpherMap) == 0 {
+			return nil
+		}
+		select {
+		case cgpherMapCh <- cgpherMap:
+		case <-errCtx.Done():
+			return errCtx.Err()
+		}
+		return nil
+	})
+	g.Go(func() error {
+		defer close(purchaseMapCh)
+		purchaseMap, err := c.baseRepo.ChoreoPurchaseRepository().GetPurchasedChoreoByUserIDMap(errCtx, userID)
+		if err != nil {
+			return err
+		}
+		if len(purchaseMap) == 0 {
+			return nil
+		}
+		select {
+		case purchaseMapCh <- purchaseMap:
+		case <-errCtx.Done():
+			return errCtx.Err()
+		}
+		return nil
+	})
+	err = g.Wait()
+	if err != nil {
+		return nil, err
+	}
+
+	cgpherMap := <-cgpherMapCh
+	musicMap := <-musicMapCh
+	purchaseMap := <-purchaseMapCh
+
+	// Construct response
+	var choreoResult []entity.ChoreographyEntity
+	for _, choreoData := range choreoList {
+		// Convert to entity
+		choreoEntity := helper.ChoreoModelToEntity(choreoData)
+		choreoEntity.Unlocked = c.checkContentUnlockStatus(choreoData)
+		choreoEntity.CurrentPrice = strconv.FormatInt(choreoData.TempPrice.Int64, 10)
+
+		// Retrieve data from model
+		if data, ok := cgpherMap[choreoEntity.ChoreographerID]; ok {
+			cgpher := helper.ChoreographerModelToEntity(data)
+			choreoEntity.ChoreographerData = &cgpher
+		}
+		if data, ok := musicMap[choreoEntity.MusicID]; ok {
+			music := helper.MusicModelToEntity(data)
+			choreoEntity.MusicData = &music
+		}
+		// If purchased, unlock content
+		if _, ok := purchaseMap[choreoEntity.ChoreoID]; ok {
+			choreoEntity.Unlocked = true
 		}
 
 		// Append to result

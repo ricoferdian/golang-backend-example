@@ -7,5 +7,6 @@ import (
 type MiddlewareInterface interface {
 	CORS() gin.HandlerFunc
 	CommonHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc
+	OptionalAuthHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc
 	AuthHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc
 }

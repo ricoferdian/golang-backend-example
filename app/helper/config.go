@@ -8,12 +8,13 @@ import (
 )
 
 type AppConfig struct {
-	ServerConf     *ServerConfig     `yaml:"http_server"`
-	HandlerConf    *HandlerConfig    `yaml:"http_handler"`
-	DBConf         *DatabaseConfig   `yaml:"database"`
-	RediConf       *RedisConfig      `yaml:"redis"`
-	MonitoringConf *MonitoringConfig `yaml:"monitoring"`
-	JWTConf        *JWTConfig        `yaml:"jwt_auth"`
+	ServerConf           *ServerConfig         `yaml:"http_server"`
+	HandlerConf          *HandlerConfig        `yaml:"http_handler"`
+	DBConf               *DatabaseConfig       `yaml:"database"`
+	RediConf             *RedisConfig          `yaml:"redis"`
+	MonitoringConf       *MonitoringConfig     `yaml:"monitoring"`
+	JWTConf              *JWTConfig            `yaml:"jwt_auth"`
+	StoreKitVerifyConfig *StoreKitVerifyConfig `yaml:"storekit_verify"`
 }
 
 type JWTConfig struct {
@@ -49,6 +50,11 @@ type DatabaseConfig struct {
 type RedisConfig struct {
 	Hostname string `yaml:"hostname"`
 	Port     string `yaml:"port"`
+}
+
+type StoreKitVerifyConfig struct {
+	Hostname string `yaml:"hostname"`
+	Timeout  int    `yaml:"timeout"`
 }
 
 func InitConfig(appName string) (config *AppConfig) {

@@ -75,7 +75,7 @@ func SetOptions(o *Options) {
 }
 
 func init() {
-	env = os.Getenv("TKPENV")
+	env = os.Getenv("APP_ENVIRONMENT")
 	// circuitbreaker to let apps died when got too many panics
 	cb = breaker.New(3, 2, time.Minute*1)
 }

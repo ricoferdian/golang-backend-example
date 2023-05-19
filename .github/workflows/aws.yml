@@ -30,14 +30,6 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      - name: Stop kora-app service
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.EC2_SSH_HOST_DNS }}
-          username: ${{ secrets.EC2_SSH_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: sudo service kora-app stop
-
       - name: Copy binary to EC2
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -47,13 +39,13 @@ jobs:
           source: "main"
           target: "/home/ubuntu/app"
 
-      - name: Start kora-app service
+      - name: Restart kora-app service
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.EC2_SSH_HOST_DNS }}
           username: ${{ secrets.EC2_SSH_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: sudo service kora-app start
+          script: sudo service kora-app restart
 
       - name: Send slack notification
         uses: 8398a7/action-slack@v3

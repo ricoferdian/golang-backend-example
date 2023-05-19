@@ -12,6 +12,9 @@ type ChoreographyEntity struct {
 	VideoThumbnailURL string  `json:"video_thumbnail_url"`
 	ChoreographerID   int64   `json:"choreographer_id"`
 	MusicID           int64   `json:"music_id"`
+	// Related to payment
+	Unlocked     bool   `json:"unlocked"`
+	CurrentPrice string `json:"current_price"`
 	// Will deprecate soon
 	Order int32 `json:"order"`
 	// Relation

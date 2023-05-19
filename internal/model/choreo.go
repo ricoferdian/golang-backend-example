@@ -15,5 +15,6 @@ type ChoreographyModel struct {
 	ChoreographerID   sql.NullInt64   `db:"choreographer_id"`
 	MusicID           sql.NullInt64   `db:"music_id"`
 	// Will deprecate soon
-	Position sql.NullInt32 `db:"position"`
+	Position  sql.NullInt32 `db:"position"`
+	TempPrice sql.NullInt64 `db:"temp_price"`
 }

@@ -27,10 +27,12 @@ import (
 	"kora-backend/internal/common/panics"
 	"kora-backend/internal/common/repository"
 	"kora-backend/internal/common/slackwebhook"
+	"kora-backend/internal/common/storekit"
 	"kora-backend/internal/domain/auth"
 	"kora-backend/internal/domain/choreo"
 	"kora-backend/internal/domain/common"
 	"kora-backend/internal/domain/learning_history"
+	"kora-backend/internal/domain/purchase"
 	delivery3 "kora-backend/internal/learning_history/delivery"
 	repository6 "kora-backend/internal/learning_history/repository"
 	postgres5 "kora-backend/internal/learning_history/repository/postgres"
@@ -38,6 +40,11 @@ import (
 	usecase3 "kora-backend/internal/learning_history/usecase"
 	repository4 "kora-backend/internal/music/repository"
 	postgres3 "kora-backend/internal/music/repository/postgres"
+	delivery4 "kora-backend/internal/purchase/delivery"
+	repository7 "kora-backend/internal/purchase/repository"
+	postgres6 "kora-backend/internal/purchase/repository/postgres"
+	redis5 "kora-backend/internal/purchase/repository/redis"
+	usecase4 "kora-backend/internal/purchase/usecase"
 	"log"
 	"net/http"
 )
@@ -50,6 +57,7 @@ type AppUseCase struct {
 	authUC            auth.UserAuthUseCase
 	choreoUC          choreo.ChoreoUseCase
 	learningHistoryUC learning_history.LearningHistoryUseCase
+	choreoPurchaseUC  purchase.ChoreoPurchaseUseCase
 }
 
 type AppHandler struct {
@@ -57,13 +65,14 @@ type AppHandler struct {
 }
 
 type AppModule struct {
-	slackModule  *slackwebhook.SlackWebhookModule
-	cryptoModule *cryptography.CryptographyModule
-	jwtModule    *jwtauth.JwtAuthModule
-	nrAgent      *newrelic.Application
-	middlewareM  *middleware.MiddlewareModule
-	dbCli        *sqlx.DB
-	redisCli     *redis.Client
+	slackModule    *slackwebhook.SlackWebhookModule
+	cryptoModule   *cryptography.CryptographyModule
+	jwtModule      *jwtauth.JwtAuthModule
+	storeKitModule *storekit.StoreKitModule
+	nrAgent        *newrelic.Application
+	middlewareM    *middleware.MiddlewareModule
+	dbCli          *sqlx.DB
+	redisCli       *redis.Client
 }
 
 func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
@@ -85,6 +94,10 @@ func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
 	appModule.jwtModule, err = jwtauth.NewJwtAuthModule(cfg.JWTConf)
 	if err != nil {
 		log.Fatalf("Failed to init JWT auth module with err : %s\n", err.Error())
+	}
+	appModule.storeKitModule, err = storekit.NewStoreKitModule(cfg.StoreKitVerifyConfig)
+	if err != nil {
+		log.Fatalf("Failed to init store kit module with err : %s\n", err.Error())
 	}
 	appModule.cryptoModule = cryptography.NewCryptographyModule()
 	appModule.middlewareM = middleware.NewMiddlewareModule(appModule.jwtModule)
@@ -117,8 +130,13 @@ func InitRepository(module *AppModule, config *helper.AppConfig) (appRepo common
 	learnHistoryRedisRepo := redis4.NewRedisLearningHistoryRepository(module.redisCli)
 	learnHistoryRepo := repository6.NewLearningHistoryRepository(learnHistoryPostgresrepo, learnHistoryRedisRepo)
 
+	// Init learning history repo
+	choreoPurchasePostgresRepo := postgres6.NewPostgresChoreoPurchaseRepository(module.dbCli)
+	choreoPurchaseRedisRepo := redis5.NewRedisChoreoPurchaseRepository(module.redisCli)
+	choreoPurchaseRepo := repository7.NewChoreoPurchaseRepository(choreoPurchasePostgresRepo, choreoPurchaseRedisRepo)
+
 	// Init base repo
-	repoDS := repository.NewRepository(authRepo, choreoRepo, musicRepo, choreographRepo, learnHistoryRepo)
+	repoDS := repository.NewRepository(authRepo, choreoRepo, musicRepo, choreographRepo, learnHistoryRepo, choreoPurchaseRepo)
 	appRepo = repository.NewBaseRepository(repoDS, config)
 	return appRepo
 }
@@ -128,6 +146,7 @@ func InitHandler(useCase *AppUseCase, appModule *AppModule, config *helper.AppCo
 	appHandler.handlers = append(appHandler.handlers, delivery.NewUserAuthHandler(appModule.middlewareM, config.HandlerConf, useCase.authUC))
 	appHandler.handlers = append(appHandler.handlers, delivery2.NewChoreoHandler(appModule.middlewareM, config.HandlerConf, useCase.choreoUC))
 	appHandler.handlers = append(appHandler.handlers, delivery3.NewLearningHistoryHandler(appModule.middlewareM, config.HandlerConf, useCase.learningHistoryUC))
+	appHandler.handlers = append(appHandler.handlers, delivery4.NewChoreoPurchaseHandler(appModule.middlewareM, config.HandlerConf, useCase.choreoPurchaseUC))
 	return appHandler
 }
 
@@ -136,6 +155,7 @@ func InitAppUseCase(appRepo common.BaseRepository, appModule *AppModule) (appUC 
 	appUC.authUC = usecase.NewUserAuthUseCase(appRepo, appModule.jwtModule, appModule.cryptoModule)
 	appUC.choreoUC = usecase2.NewChoreoUseCase(appRepo)
 	appUC.learningHistoryUC = usecase3.NewLearningHistoryUseCase(appRepo)
+	appUC.choreoPurchaseUC = usecase4.NewChoreoPurchaseUseCase(appRepo, appModule.storeKitModule)
 	return appUC
 }
 
@@ -169,6 +189,9 @@ func InitRouter(appHandler *AppHandler, appModule *AppModule) (router *gin.Engin
 		c.JSON(http.StatusOK, gin.H{
 			"data": "service are up and running",
 		})
+	})
+	router.GET("/testpanic", func(c *gin.Context) {
+		panic("test panic")
 	})
 	return router
 }

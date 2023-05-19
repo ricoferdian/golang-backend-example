@@ -5,6 +5,7 @@ import (
 	"kora-backend/app/helper/http"
 	"kora-backend/internal/common/constants"
 	"kora-backend/internal/common/jwtauth"
+	"kora-backend/internal/entity"
 	"strings"
 	"time"
 )
@@ -21,6 +22,25 @@ func NewMiddlewareModule(jwtAuth *jwtauth.JwtAuthModule) *MiddlewareModule {
 	}
 }
 
+func (m *MiddlewareModule) OptionalAuthHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		startTime := time.Now()
+		var (
+			bearerToken = c.Request.Header.Get("Authorization")
+		)
+		if bearerToken != "" {
+			// If token provided and valid, do some auth
+			// If not valid, handle as unauthenticated user
+			isValid, userEntity := m.getUserAuthData(c, bearerToken, startTime)
+			if isValid {
+				c.Set(constants.CtxAuthUserData, userEntity)
+			}
+		}
+		next(c)
+		return
+	}
+}
+
 func (m *MiddlewareModule) AuthHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
@@ -31,27 +51,34 @@ func (m *MiddlewareModule) AuthHandlerMiddleware(next gin.HandlerFunc) gin.Handl
 			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
 			return
 		}
-		token := strings.SplitN(bearerToken, " ", 2)
-		if len(token) < 2 {
-			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
-			return
-		}
-		isValid, userEntity, err := m.jwtAuth.ValidateToken(token[1])
-		if err != nil {
-			if err.Error() == constants.ErrTokenExpired {
-				http.WriteErrorResponseByCode(c, startTime, http.StatusTokenExpired)
-				return
-			}
-			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
-			return
-		}
+		isValid, userEntity := m.getUserAuthData(c, bearerToken, startTime)
 		if !isValid {
 			http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
 			return
 		}
 		c.Set(constants.CtxAuthUserData, userEntity)
 		next(c)
+		return
 	}
+}
+
+func (m *MiddlewareModule) getUserAuthData(c *gin.Context, bearerToken string, startTime time.Time) (isValid bool, userEntity *entity.AuthenticatedUserEntity) {
+	token := strings.SplitN(bearerToken, " ", 2)
+	if len(token) < 2 {
+		http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
+		return
+	}
+	isValid, userEntity, err := m.jwtAuth.ValidateToken(token[1])
+	if err != nil {
+		if err.Error() == constants.ErrTokenExpired {
+			http.WriteErrorResponseByCode(c, startTime, http.StatusTokenExpired)
+			return
+		}
+		http.WriteErrorResponseByCode(c, startTime, http.StatusForbidden)
+		return
+	}
+
+	return isValid, userEntity
 }
 
 func (m *MiddlewareModule) CommonHandlerMiddleware(next gin.HandlerFunc) gin.HandlerFunc {

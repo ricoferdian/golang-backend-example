@@ -8,6 +8,7 @@ import (
 	"kora-backend/internal/domain/common"
 	"kora-backend/internal/domain/learning_history"
 	"kora-backend/internal/domain/music"
+	"kora-backend/internal/domain/purchase"
 )
 
 type Repository struct {
@@ -16,6 +17,7 @@ type Repository struct {
 	musicRepo           music.MusicRepository
 	choreographerRepo   choreographer.ChoreographerRepository
 	learningHistoryRepo learning_history.LearningHistoryRepository
+	choreoPurchaseRepo  purchase.ChoreoPurchaseRepository
 }
 
 func NewRepository(
@@ -24,6 +26,7 @@ func NewRepository(
 	musicRepo music.MusicRepository,
 	choreographerRepo choreographer.ChoreographerRepository,
 	learningHistoryRepo learning_history.LearningHistoryRepository,
+	choreoPurchaseRepo purchase.ChoreoPurchaseRepository,
 ) Repository {
 	return Repository{
 		userAuthRepo:        userAuthRepo,
@@ -31,12 +34,17 @@ func NewRepository(
 		musicRepo:           musicRepo,
 		choreographerRepo:   choreographerRepo,
 		learningHistoryRepo: learningHistoryRepo,
+		choreoPurchaseRepo:  choreoPurchaseRepo,
 	}
 }
 
 type BaseRepositoryImpl struct {
 	repo   Repository
 	config *helper.AppConfig
+}
+
+func (repo BaseRepositoryImpl) ChoreoPurchaseRepository() purchase.ChoreoPurchaseRepository {
+	return repo.repo.choreoPurchaseRepo
 }
 
 func (repo BaseRepositoryImpl) GetAppConfig() *helper.AppConfig {

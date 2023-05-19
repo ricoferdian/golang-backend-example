@@ -7,6 +7,7 @@ import (
 	"kora-backend/internal/domain/choreographer"
 	"kora-backend/internal/domain/learning_history"
 	"kora-backend/internal/domain/music"
+	"kora-backend/internal/domain/purchase"
 )
 
 type BaseRepository interface {
@@ -15,5 +16,6 @@ type BaseRepository interface {
 	MusicRepository() music.MusicRepository
 	ChoreographerRepository() choreographer.ChoreographerRepository
 	LearningHistoryRepository() learning_history.LearningHistoryRepository
+	ChoreoPurchaseRepository() purchase.ChoreoPurchaseRepository
 	GetAppConfig() *helper.AppConfig
 }
