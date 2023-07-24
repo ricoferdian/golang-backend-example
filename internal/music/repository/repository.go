@@ -1,6 +1,6 @@
 package repository
 
-import "kora-backend/internal/domain/music"
+import "github.com/Kora-Dance/koradance-backend/internal/domain/music"
 
 type MusicRepositoryImpl struct {
 	music.MusicDatabaseRepo

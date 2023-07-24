@@ -3,12 +3,13 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	sq "github.com/huandu/go-sqlbuilder"
-	"kora-backend/internal/model"
 )
 
-func (c PostgresChoreoRepository) getChoreoListRows(ctx context.Context) (rows *sql.Rows, err error) {
-	query, args := c.buildGetChoreoList()
+func (c PostgresChoreoRepository) getChoreoListRows(ctx context.Context, filter entity.ChoreoFilterEntity) (rows *sql.Rows, err error) {
+	query, args := c.buildGetChoreoList(filter)
 	rows, err = c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -39,8 +40,8 @@ func (c PostgresChoreoRepository) GetChoreoById(ctx context.Context, choreoID in
 	return nil, nil
 }
 
-func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []model.ChoreographyModel, err error) {
-	rows, err := c.getChoreoListRows(ctx)
+func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context, filter entity.ChoreoFilterEntity) (result []model.ChoreographyModel, err error) {
+	rows, err := c.getChoreoListRows(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +56,8 @@ func (c PostgresChoreoRepository) GetChoreoList(ctx context.Context) (result []m
 	return result, nil
 }
 
-func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx context.Context) (result []model.ChoreographyModel, choreoIds []int64, musicIds []int64, choreographerIds []int64, err error) {
-	rows, err := c.getChoreoListRows(ctx)
+func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx context.Context, filter entity.ChoreoFilterEntity) (result []model.ChoreographyModel, choreoIds []int64, musicIds []int64, choreographerIds []int64, err error) {
+	rows, err := c.getChoreoListRows(ctx, filter)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -83,10 +84,25 @@ func (c PostgresChoreoRepository) GetChoreoListWithMusicAndChoreographIds(ctx co
 	return result, choreoIds, musicIds, choreographerIds, nil
 }
 
-func (c PostgresChoreoRepository) buildGetChoreoList() (string, []interface{}) {
+func (c PostgresChoreoRepository) buildGetChoreoList(filter entity.ChoreoFilterEntity) (string, []interface{}) {
 	sb := sq.NewSelectBuilder()
 	sb.Select(columnSelectAllChoreo)
 	sb.From(tableMasterChoreo)
+
+	if filter.ChoreoID != 0 {
+		sb.Where(sb.Equal("choreo_id", filter.ChoreoID))
+	}
+	if filter.Difficulty != 0 {
+		sb.Where(sb.Equal("difficulty", filter.Difficulty))
+	}
+	if filter.Price != 0 {
+		sb.Where(sb.Equal("temp_price", filter.Price))
+	}
+	if filter.ChoreographerID != 0 {
+		sb.Where(sb.Equal("choreographer_id", filter.ChoreographerID))
+	}
+
+	sb.OrderBy("created_at").Desc()
 
 	return sb.Build()
 }
@@ -111,8 +127,11 @@ func (c PostgresChoreoRepository) scanChoreoData(row *sql.Rows) (result model.Ch
 		&result.Position,
 		&result.VideoPreviewURL,
 		&result.VideoThumbnailURL,
+		&result.CDNVideoPreviewURL,
+		&result.CDNVideoThumbnailURL,
 		&result.ChoreographerID,
 		&result.MusicID,
+		&result.AdditionalInfo,
 		&result.TempPrice,
 	)
 

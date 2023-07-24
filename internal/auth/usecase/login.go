@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kora-backend/internal/entity"
+	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
 func (u UserAuthUseCaseImpl) Login(ctx context.Context, user entity.LoginUserEntity) (*entity.AuthUserResponseEntity, error) {
 	filter := entity.UserFilterEntity{
 		UserIdentity: user.UserIdentity,
+		AuthType:     constants.AuthTypeUserPassword,
 	}
 	userData, err := u.baseRepo.UserAuthRepository().GetSingleUserByUniqueFilter(ctx, filter)
 	if err != nil {
@@ -18,7 +20,10 @@ func (u UserAuthUseCaseImpl) Login(ctx context.Context, user entity.LoginUserEnt
 	if userData == nil {
 		return nil, errors.New(fmt.Sprintf("User credential not found for user identity %s", user.UserIdentity))
 	}
-	isValid := u.cryptoModule.ComparePassword(userData.HashPasswordIdentifier, user.PasswordIdentifier)
+	if !userData.HashPasswordIdentifier.Valid {
+		return nil, errors.New(fmt.Sprintf("User credential not found for user identity %s", user.UserIdentity))
+	}
+	isValid := u.cryptoModule.ComparePassword(userData.HashPasswordIdentifier.String, user.PasswordIdentifier)
 	if !isValid {
 		return nil, errors.New(fmt.Sprintf("User password does not match for identity %s", user.UserIdentity))
 	}

@@ -1,6 +1,6 @@
 package repository
 
-import "kora-backend/internal/domain/choreographer"
+import "github.com/Kora-Dance/koradance-backend/internal/domain/choreographer"
 
 type ChoreographerRepositoryImpl struct {
 	choreographer.ChoreographerDatabaseRepo

@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"kora-backend/internal/domain/purchase"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/purchase"
 )
 
 type ChoreoPurchaseRepositoryImpl struct {

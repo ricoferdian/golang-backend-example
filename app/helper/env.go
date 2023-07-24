@@ -20,7 +20,7 @@ func GetConfigPath(env string) string {
 	if env == developmentEnv {
 		return "files/etc/config"
 	}
-	return "/home/ubuntu/app/files/etc/config"
+	return "files/etc/config"
 }
 
 func GetHostname() string {

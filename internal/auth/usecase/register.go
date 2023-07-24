@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"kora-backend/internal/entity"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
 func (u UserAuthUseCaseImpl) Register(ctx context.Context, user entity.UserEntity) (*entity.AuthUserResponseEntity, error) {

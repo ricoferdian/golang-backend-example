@@ -2,14 +2,14 @@ package delivery
 
 import (
 	"context"
+	"github.com/Kora-Dance/koradance-backend/app/helper/http"
+	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
-	"kora-backend/app/helper/http"
-	"kora-backend/internal/common/constants"
-	"kora-backend/internal/entity"
 	"time"
 )
 
-func (api LearningHistoryHandler) getHistoryListHandler(c *gin.Context) {
+func (api LearningHistoryHandler) getHistoryListHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
 	defer cancel()
 

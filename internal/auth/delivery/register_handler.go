@@ -3,10 +3,10 @@ package delivery
 import (
 	"context"
 	"errors"
+	"github.com/Kora-Dance/koradance-backend/app/helper/http"
+	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
-	"kora-backend/app/helper/http"
-	"kora-backend/internal/common/constants"
-	"kora-backend/internal/entity"
 	"strconv"
 	"time"
 )
@@ -36,7 +36,7 @@ func validateRegisterParam(c *gin.Context) (*entity.UserEntity, error) {
 	}, nil
 }
 
-func (api UserAuthHandler) authUserRegisterHandler(c *gin.Context) {
+func (api UserAuthHandler) authUserRegisterHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
 	defer cancel()
 

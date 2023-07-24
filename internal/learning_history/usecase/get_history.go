@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/learning_history/helper"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/learning_history/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
 func (c LearningHistoryUseCaseImpl) GetUserLearningHistory(ctx context.Context, userID int64) (resultEntity []entity.LearningHistoryEntity, err error) {

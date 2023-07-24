@@ -2,10 +2,10 @@ package redis
 
 import (
 	"context"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/auth"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/redis/go-redis/v9"
-	"kora-backend/internal/domain/auth"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
 )
 
 type RedisUserAuthRepository struct {

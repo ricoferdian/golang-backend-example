@@ -2,19 +2,15 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+	"github.com/Kora-Dance/koradance-backend/internal/learning_history/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	sq "github.com/huandu/go-sqlbuilder"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/learning_history/helper"
-	"kora-backend/internal/model"
 )
 
 func (c PostgresLearningHistoryRepository) InsertLearningHistory(ctx context.Context, history entity.SubmitLearningHistoryEntity) (*model.SubmitLearningHistoryModel, error) {
 	query, args := c.buildInsertLearningHistory(history)
 	historyId, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
 	if err != nil {
 		return nil, err
 	}

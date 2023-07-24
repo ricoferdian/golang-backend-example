@@ -21,26 +21,28 @@ type BaseResponse struct {
 const (
 	StatusSuccess             = "OK"
 	StatusAuthFailed          = "AUTH_FAILED"
+	StatusVerificationFailed  = "VERIFICATION_FAILED"
 	StatusUserIdentifierExist = "USER_ALREADY_EXIST"
 	StatusTokenExpired        = "EXPIRED_TOKEN"
 	StatusInvalidRequest      = "INVALID_REQUEST"
 	StatusFailedDatabase      = "ERROR_DATABASE"
 	StatusServerError         = "SERVER_ERROR"
 	StatusNotFound            = "NOT_FOUND"
-	StatusForbidden           = "REQUEST_DENIED"
+	StatusUnauthorized        = "UNAUTHORIZED"
 	StatusRequestTimeout      = "REQUEST_TIMEOUT"
 )
 
 var (
 	mapStatusWithCode = map[string]int{
-		StatusSuccess:        200,
-		StatusAuthFailed:     200,
-		StatusInvalidRequest: 400,
-		StatusFailedDatabase: 500,
-		StatusServerError:    500,
-		StatusNotFound:       404,
-		StatusForbidden:      403,
-		StatusRequestTimeout: 408,
+		StatusSuccess:            200,
+		StatusAuthFailed:         200,
+		StatusVerificationFailed: 200,
+		StatusInvalidRequest:     400,
+		StatusFailedDatabase:     500,
+		StatusServerError:        500,
+		StatusNotFound:           404,
+		StatusUnauthorized:       401,
+		StatusRequestTimeout:     408,
 	}
 )
 

@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"github.com/jmoiron/sqlx"
-	"kora-backend/internal/domain/auth"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/auth"
 )
 
 type PostgresUserAuthRepository struct {

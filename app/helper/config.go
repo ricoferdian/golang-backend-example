@@ -15,6 +15,8 @@ type AppConfig struct {
 	MonitoringConf       *MonitoringConfig     `yaml:"monitoring"`
 	JWTConf              *JWTConfig            `yaml:"jwt_auth"`
 	StoreKitVerifyConfig *StoreKitVerifyConfig `yaml:"storekit_verify"`
+	SecureOtpConfig      *SecureOtpConfig      `yaml:"secure_otp"`
+	AWSConfig            *AWSConfig            `yaml:"aws"`
 }
 
 type JWTConfig struct {
@@ -24,10 +26,16 @@ type JWTConfig struct {
 	ClaimExpirySec int    `yaml:"claim_expiry_sec"` // in seconds
 }
 
+type SecureOtpConfig struct {
+	OtpIssuer    string `yaml:"otp_issuer"`
+	OtpExpirySec int    `yaml:"otp_expiry_sec"` // in seconds
+}
+
 type MonitoringConfig struct {
 	NewRelicKey              string `yaml:"newrelic_key"`
 	EnableLogForwarding      bool   `yaml:"enable_log_forwarding"`
 	EnableDistributedTracing bool   `yaml:"enable_distributed_tracing"`
+	EnableCodeLevelMetrics   bool   `yaml:"enable_code_level_metrics"`
 }
 
 type ServerConfig struct {
@@ -55,6 +63,24 @@ type RedisConfig struct {
 type StoreKitVerifyConfig struct {
 	Hostname string `yaml:"hostname"`
 	Timeout  int    `yaml:"timeout"`
+}
+
+type AWSConfig struct {
+	S3Config *S3BucketConfig   `yaml:"s3"`
+	CFConfig *CloudFrontConfig `yaml:"cloudfront"`
+}
+
+type CloudFrontConfig struct {
+	URL string `yaml:"url"`
+}
+
+type S3BucketConfig struct {
+	BucketName    string               `yaml:"bucket_name"`
+	ContentConfig *KoraContentS3Config `yaml:"content"`
+}
+
+type KoraContentS3Config struct {
+	Path string `yaml:"path"`
 }
 
 func InitConfig(appName string) (config *AppConfig) {

@@ -1,6 +1,6 @@
 package repository
 
-import "kora-backend/internal/domain/auth"
+import "github.com/Kora-Dance/koradance-backend/internal/domain/auth"
 
 type UserAuthRepositoryImpl struct {
 	auth.UserAuthDatabaseRepo

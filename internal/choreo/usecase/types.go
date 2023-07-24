@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"kora-backend/internal/domain/choreo"
-	"kora-backend/internal/domain/common"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/choreo"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/common"
 )
 
 type ChoreoUseCaseImpl struct {

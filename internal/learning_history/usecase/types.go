@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"kora-backend/internal/domain/common"
-	"kora-backend/internal/domain/learning_history"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/common"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
 )
 
 type LearningHistoryUseCaseImpl struct {

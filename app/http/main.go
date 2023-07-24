@@ -2,49 +2,58 @@ package main
 
 import (
 	"fmt"
+	"github.com/Kora-Dance/koradance-backend/app/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/auth/delivery"
+	repository2 "github.com/Kora-Dance/koradance-backend/internal/auth/repository"
+	"github.com/Kora-Dance/koradance-backend/internal/auth/repository/postgres"
+	redis2 "github.com/Kora-Dance/koradance-backend/internal/auth/repository/redis"
+	"github.com/Kora-Dance/koradance-backend/internal/auth/usecase"
+	delivery2 "github.com/Kora-Dance/koradance-backend/internal/choreo/delivery"
+	repository3 "github.com/Kora-Dance/koradance-backend/internal/choreo/repository"
+	postgres2 "github.com/Kora-Dance/koradance-backend/internal/choreo/repository/postgres"
+	redis3 "github.com/Kora-Dance/koradance-backend/internal/choreo/repository/redis"
+	"github.com/Kora-Dance/koradance-backend/internal/choreo/repository/s3"
+	usecase2 "github.com/Kora-Dance/koradance-backend/internal/choreo/usecase"
+	delivery5 "github.com/Kora-Dance/koradance-backend/internal/choreographer/delivery"
+	repository5 "github.com/Kora-Dance/koradance-backend/internal/choreographer/repository"
+	postgres4 "github.com/Kora-Dance/koradance-backend/internal/choreographer/repository/postgres"
+	usecase5 "github.com/Kora-Dance/koradance-backend/internal/choreographer/usecase"
+	"github.com/Kora-Dance/koradance-backend/internal/common/router"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/auth"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/choreo"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/choreographer"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/common"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/purchase"
+	delivery3 "github.com/Kora-Dance/koradance-backend/internal/learning_history/delivery"
+	repository6 "github.com/Kora-Dance/koradance-backend/internal/learning_history/repository"
+	postgres5 "github.com/Kora-Dance/koradance-backend/internal/learning_history/repository/postgres"
+	redis4 "github.com/Kora-Dance/koradance-backend/internal/learning_history/repository/redis"
+	usecase3 "github.com/Kora-Dance/koradance-backend/internal/learning_history/usecase"
+	repository8 "github.com/Kora-Dance/koradance-backend/internal/like_save/repository"
+	postgres7 "github.com/Kora-Dance/koradance-backend/internal/like_save/repository/postgres"
+	repository4 "github.com/Kora-Dance/koradance-backend/internal/music/repository"
+	postgres3 "github.com/Kora-Dance/koradance-backend/internal/music/repository/postgres"
+	delivery4 "github.com/Kora-Dance/koradance-backend/internal/purchase/delivery"
+	repository7 "github.com/Kora-Dance/koradance-backend/internal/purchase/repository"
+	postgres6 "github.com/Kora-Dance/koradance-backend/internal/purchase/repository/postgres"
+	redis5 "github.com/Kora-Dance/koradance-backend/internal/purchase/repository/redis"
+	usecase4 "github.com/Kora-Dance/koradance-backend/internal/purchase/usecase"
+	"github.com/Kora-Dance/koradance-backend/pkg/aws"
+	"github.com/Kora-Dance/koradance-backend/pkg/cryptography"
+	"github.com/Kora-Dance/koradance-backend/pkg/jwtauth"
+	"github.com/Kora-Dance/koradance-backend/pkg/middleware"
+	"github.com/Kora-Dance/koradance-backend/pkg/panics"
+	"github.com/Kora-Dance/koradance-backend/pkg/repository"
+	"github.com/Kora-Dance/koradance-backend/pkg/secure_otp"
+	"github.com/Kora-Dance/koradance-backend/pkg/slackwebhook"
+	"github.com/Kora-Dance/koradance-backend/pkg/storekit"
+	"github.com/Kora-Dance/koradance-backend/pkg/whatsapp"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/newrelic/go-agent/v3/integrations/nrgin"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/redis/go-redis/v9"
-	"kora-backend/app/helper"
-	"kora-backend/internal/auth/delivery"
-	repository2 "kora-backend/internal/auth/repository"
-	"kora-backend/internal/auth/repository/postgres"
-	redis2 "kora-backend/internal/auth/repository/redis"
-	"kora-backend/internal/auth/usecase"
-	delivery2 "kora-backend/internal/choreo/delivery"
-	repository3 "kora-backend/internal/choreo/repository"
-	postgres2 "kora-backend/internal/choreo/repository/postgres"
-	redis3 "kora-backend/internal/choreo/repository/redis"
-	usecase2 "kora-backend/internal/choreo/usecase"
-	repository5 "kora-backend/internal/choreographer/repository"
-	postgres4 "kora-backend/internal/choreographer/repository/postgres"
-	"kora-backend/internal/common/cryptography"
-	"kora-backend/internal/common/jwtauth"
-	"kora-backend/internal/common/middleware"
-	"kora-backend/internal/common/panics"
-	"kora-backend/internal/common/repository"
-	"kora-backend/internal/common/slackwebhook"
-	"kora-backend/internal/common/storekit"
-	"kora-backend/internal/domain/auth"
-	"kora-backend/internal/domain/choreo"
-	"kora-backend/internal/domain/common"
-	"kora-backend/internal/domain/learning_history"
-	"kora-backend/internal/domain/purchase"
-	delivery3 "kora-backend/internal/learning_history/delivery"
-	repository6 "kora-backend/internal/learning_history/repository"
-	postgres5 "kora-backend/internal/learning_history/repository/postgres"
-	redis4 "kora-backend/internal/learning_history/repository/redis"
-	usecase3 "kora-backend/internal/learning_history/usecase"
-	repository4 "kora-backend/internal/music/repository"
-	postgres3 "kora-backend/internal/music/repository/postgres"
-	delivery4 "kora-backend/internal/purchase/delivery"
-	repository7 "kora-backend/internal/purchase/repository"
-	postgres6 "kora-backend/internal/purchase/repository/postgres"
-	redis5 "kora-backend/internal/purchase/repository/redis"
-	usecase4 "kora-backend/internal/purchase/usecase"
 	"log"
 	"net/http"
 )
@@ -58,6 +67,7 @@ type AppUseCase struct {
 	choreoUC          choreo.ChoreoUseCase
 	learningHistoryUC learning_history.LearningHistoryUseCase
 	choreoPurchaseUC  purchase.ChoreoPurchaseUseCase
+	choreographerUC   choreographer.ChoreographerUseCase
 }
 
 type AppHandler struct {
@@ -65,14 +75,17 @@ type AppHandler struct {
 }
 
 type AppModule struct {
+	otpModule      *secure_otp.SecureOtpModule
+	waModule       *whatsapp.WhatsappModule
 	slackModule    *slackwebhook.SlackWebhookModule
 	cryptoModule   *cryptography.CryptographyModule
 	jwtModule      *jwtauth.JwtAuthModule
 	storeKitModule *storekit.StoreKitModule
 	nrAgent        *newrelic.Application
-	middlewareM    *middleware.MiddlewareModule
+	middlewareM    middleware.MiddlewareInterface
 	dbCli          *sqlx.DB
 	redisCli       *redis.Client
+	awsM           *aws.AWSClient
 }
 
 func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
@@ -81,6 +94,7 @@ func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
 		newrelic.ConfigLicense(cfg.MonitoringConf.NewRelicKey),
 		newrelic.ConfigAppLogForwardingEnabled(cfg.MonitoringConf.EnableLogForwarding),
 		newrelic.ConfigDistributedTracerEnabled(cfg.MonitoringConf.EnableDistributedTracing),
+		newrelic.ConfigCodeLevelMetricsEnabled(cfg.MonitoringConf.EnableCodeLevelMetrics),
 	)
 	if err != nil {
 		log.Fatalf("Failed to init new relic with err : %s\n", err.Error())
@@ -103,6 +117,12 @@ func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
 	appModule.middlewareM = middleware.NewMiddlewareModule(appModule.jwtModule)
 	appModule.dbCli = InitDBCLient(cfg.DBConf)
 	appModule.redisCli = InitRedisClient(cfg.RediConf)
+	appModule.waModule = whatsapp.NewWhatsappModule(cfg.DBConf, appModule.slackModule)
+	appModule.otpModule = secure_otp.NewSecureOtpModule(cfg.SecureOtpConfig, appModule.redisCli)
+	appModule.awsM, err = aws.NewAWSModule(cfg.AWSConfig)
+	if err != nil {
+		log.Fatalf("Failed to init AWS module with err : %s\n", err.Error())
+	}
 	return appModule
 }
 
@@ -123,20 +143,25 @@ func InitRepository(module *AppModule, config *helper.AppConfig) (appRepo common
 	// Init choreo repo
 	choreoPostgresrepo := postgres2.NewPostgresChoreoRepository(module.dbCli)
 	choreoRedisRepo := redis3.NewRedisChoreoRepository(module.redisCli)
-	choreoRepo := repository3.NewChoreoRepository(choreoPostgresrepo, choreoRedisRepo)
+	choreoS3Repo := s3.NewS3ChoreoContentRepository(module.awsM, config.AWSConfig.S3Config)
+	choreoRepo := repository3.NewChoreoRepository(choreoPostgresrepo, choreoRedisRepo, choreoS3Repo)
 
 	// Init learning history repo
 	learnHistoryPostgresrepo := postgres5.NewPostgresLearningHistoryRepository(module.dbCli)
 	learnHistoryRedisRepo := redis4.NewRedisLearningHistoryRepository(module.redisCli)
 	learnHistoryRepo := repository6.NewLearningHistoryRepository(learnHistoryPostgresrepo, learnHistoryRedisRepo)
 
-	// Init learning history repo
+	// Init purchase repo
 	choreoPurchasePostgresRepo := postgres6.NewPostgresChoreoPurchaseRepository(module.dbCli)
 	choreoPurchaseRedisRepo := redis5.NewRedisChoreoPurchaseRepository(module.redisCli)
 	choreoPurchaseRepo := repository7.NewChoreoPurchaseRepository(choreoPurchasePostgresRepo, choreoPurchaseRedisRepo)
 
+	// Init choreo like repo
+	likeSaveChoreoPostgresRepo := postgres7.NewPostgresLikeSaveRepository(module.dbCli)
+	likeSaveRepo := repository8.NewLikeSaveRepository(likeSaveChoreoPostgresRepo, nil)
+
 	// Init base repo
-	repoDS := repository.NewRepository(authRepo, choreoRepo, musicRepo, choreographRepo, learnHistoryRepo, choreoPurchaseRepo)
+	repoDS := repository.NewRepository(authRepo, choreoRepo, musicRepo, choreographRepo, learnHistoryRepo, choreoPurchaseRepo, likeSaveRepo)
 	appRepo = repository.NewBaseRepository(repoDS, config)
 	return appRepo
 }
@@ -147,15 +172,17 @@ func InitHandler(useCase *AppUseCase, appModule *AppModule, config *helper.AppCo
 	appHandler.handlers = append(appHandler.handlers, delivery2.NewChoreoHandler(appModule.middlewareM, config.HandlerConf, useCase.choreoUC))
 	appHandler.handlers = append(appHandler.handlers, delivery3.NewLearningHistoryHandler(appModule.middlewareM, config.HandlerConf, useCase.learningHistoryUC))
 	appHandler.handlers = append(appHandler.handlers, delivery4.NewChoreoPurchaseHandler(appModule.middlewareM, config.HandlerConf, useCase.choreoPurchaseUC))
+	appHandler.handlers = append(appHandler.handlers, delivery5.NewChoreographerHandler(appModule.middlewareM, config.HandlerConf, useCase.choreographerUC))
 	return appHandler
 }
 
 func InitAppUseCase(appRepo common.BaseRepository, appModule *AppModule) (appUC *AppUseCase) {
 	appUC = &AppUseCase{}
-	appUC.authUC = usecase.NewUserAuthUseCase(appRepo, appModule.jwtModule, appModule.cryptoModule)
+	appUC.authUC = usecase.NewUserAuthUseCase(appRepo, appModule.jwtModule, appModule.cryptoModule, appModule.otpModule, appModule.waModule)
 	appUC.choreoUC = usecase2.NewChoreoUseCase(appRepo)
 	appUC.learningHistoryUC = usecase3.NewLearningHistoryUseCase(appRepo)
 	appUC.choreoPurchaseUC = usecase4.NewChoreoPurchaseUseCase(appRepo, appModule.storeKitModule)
+	appUC.choreographerUC = usecase5.NewChoreographerUseCase(appRepo)
 	return appUC
 }
 
@@ -178,22 +205,27 @@ func InitRedisClient(cfg *helper.RedisConfig) (cli *redis.Client) {
 	})
 }
 
-func InitRouter(appHandler *AppHandler, appModule *AppModule) (router *gin.Engine) {
-	router = gin.Default()
-	router.Use(panics.CaptureGinHandler())
-	router.Use(nrgin.Middleware(appModule.nrAgent))
-	for _, handler := range appHandler.handlers {
-		handler.RegisterPath(router)
-	}
-	router.GET("/healthcheck", func(c *gin.Context) {
+func InitRouter(appHandler *AppHandler, appModule *AppModule, appConfig *helper.AppConfig) (ginEngine *gin.Engine) {
+	ginRouter := gin.Default()
+	ginRouter.Use(panics.CaptureGinHandler())
+	ginRouter.GET("/healthcheck", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"data": "service are up and running",
 		})
 	})
-	router.GET("/testpanic", func(c *gin.Context) {
+	ginRouter.GET("/testpanic", func(c *gin.Context) {
 		panic("test panic")
 	})
-	return router
+	ginRouter.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Kora is up and running !",
+		})
+	})
+	koraRouter := router.NewRouter(ginRouter, appModule.nrAgent)
+	for _, handler := range appHandler.handlers {
+		handler.RegisterPath(koraRouter)
+	}
+	return ginRouter
 }
 
 func main() {
@@ -217,16 +249,17 @@ func main() {
 	log.Println("Initializing handler")
 	appHandler := InitHandler(appUC, appModule, cfg)
 	log.Println("Initializing server")
-	router := InitRouter(appHandler, appModule)
+	ginRouter := InitRouter(appHandler, appModule, cfg)
+	err = ginRouter.Run(fmt.Sprintf(":%s", cfg.ServerConf.Port))
+	if err != nil {
+		log.Fatalln("Failed to start server", err)
+	}
 	log.Println("App successfully initialized")
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Kora is up and running !",
-		})
-	})
-	err = router.Run()
 	if err != nil {
-		return
+		log.Println("error serving http ", err)
 	}
+	defer func() {
+		appModule.waModule.Stop()
+	}()
 }

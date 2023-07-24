@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
 	sq "github.com/huandu/go-sqlbuilder"
 	"github.com/lib/pq"
-	"kora-backend/internal/model"
 )
 
 func (c PostgresChoreographerRepository) GetChoreographerByIdsMap(ctx context.Context, choreographerIDs []int64) (map[int64]model.ChoreographerModel, error) {
@@ -44,6 +44,28 @@ func (c PostgresChoreographerRepository) buildGetChoreographerByIDs(choreographe
 	return anySb.Build()
 }
 
+func (c PostgresChoreographerRepository) GetChoreographerList(ctx context.Context) ([]model.ChoreographerModel, error) {
+	query, args := c.buildGetChoreographerList()
+	rows, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var choreographerList []model.ChoreographerModel
+	for rows.Next() {
+		choreographerData, err := c.scanChoreographerData(rows)
+		if err != nil {
+			return nil, err
+		}
+		choreographerList = append(choreographerList, choreographerData)
+	}
+	return choreographerList, nil
+}
+
 func (c PostgresChoreographerRepository) GetChoreographerById(ctx context.Context, choreographerID int64) (*model.ChoreographerModel, error) {
 	if choreographerID == 0 {
 		return nil, errors.New("choreographerID must be supplied")
@@ -69,6 +91,14 @@ func (c PostgresChoreographerRepository) GetChoreographerById(ctx context.Contex
 	return &choreographerData, nil
 }
 
+func (c PostgresChoreographerRepository) buildGetChoreographerList() (string, []interface{}) {
+	sb := sq.NewSelectBuilder()
+	sb.Select(columnSelectAllChoreographer)
+	sb.From(tableMasterChoreographer)
+
+	return sb.Build()
+}
+
 func (c PostgresChoreographerRepository) buildGetChoreographerByID(choreographerID int64) (string, []interface{}) {
 	sb := sq.NewSelectBuilder()
 	sb.Select(columnSelectAllChoreographer)
@@ -83,6 +113,8 @@ func (c PostgresChoreographerRepository) scanChoreographerData(row *sql.Rows) (r
 	err = row.Scan(
 		&result.ChoreographerID,
 		&result.ChoreographerName,
+		&result.Description,
+		&result.ProfileImageURL,
 	)
 
 	return result, err

@@ -2,7 +2,7 @@ package helper
 
 import (
 	"errors"
-	slack "kora-backend/internal/common/slackwebhook"
+	slack "github.com/Kora-Dance/koradance-backend/pkg/slackwebhook"
 	"os"
 )
 
@@ -13,7 +13,21 @@ func SendServiceStartAlert(slackModule *slack.SlackWebhookModule) error {
 		Text:        "Service is starting",
 		Attachments: []slack.Attachment{attachment1},
 	}
-	err := slackModule.SendAlertWebhook(payload)
+	err := slackModule.SendSlackWebhook(payload)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SendWhatsappMessageSlack(slackModule *slack.SlackWebhookModule, phoneNumber, message string) error {
+	attachment1 := slack.Attachment{}
+	attachment1.AddField(slack.Field{Title: phoneNumber, Value: message})
+	payload := slack.Payload{
+		Text:        "Whatsapp Message",
+		Attachments: []slack.Attachment{attachment1},
+	}
+	err := slackModule.SendSlackWebhook(payload)
 	if err != nil {
 		return err
 	}
@@ -28,7 +42,7 @@ func SendServiceFailureAlert(slackModule *slack.SlackWebhookModule, errMsg error
 		Text:        "Service is has been stopped",
 		Attachments: []slack.Attachment{attachment1},
 	}
-	err := slackModule.SendAlertWebhook(payload)
+	err := slackModule.SendSlackWebhook(payload)
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"github.com/jmoiron/sqlx"
-	"kora-backend/internal/domain/music"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/music"
 )
 
 type PostgresMusicRepository struct {

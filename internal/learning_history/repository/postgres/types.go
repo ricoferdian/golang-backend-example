@@ -1,8 +1,8 @@
 package postgres
 
 import (
+	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
 	"github.com/jmoiron/sqlx"
-	"kora-backend/internal/domain/learning_history"
 )
 
 type PostgresLearningHistoryRepository struct {

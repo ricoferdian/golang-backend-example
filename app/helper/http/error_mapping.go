@@ -1,8 +1,8 @@
 package http
 
 const (
-	errForbiddenMsg    = "Maaf, anda tidak memiliki wewenang untuk mengakses fitur ini"
-	errForbiddenReason = "User has not authenticated or token not provided"
+	errUnauthorizedMsg    = "Maaf, anda harus memiliki akun untuk mengakses fitur ini"
+	errUnauthorizedReason = "User has not authenticated or token not provided"
 
 	errInvalidMsg    = "Maaf, terjadi kesalahan"
 	errInvalidReason = "Invalid request parameters"
@@ -18,13 +18,16 @@ const (
 
 	userAlreadyExistMsg    = "Nama pengguna sudah digunakan"
 	userAlreadyExistReason = "Token has been invalidated due to expiration"
+
+	verifyFailedMsg    = "Verifikasi gagal"
+	verifyFailedReason = "Token invalid or has been invalidated due to expiration"
 )
 
 var errorMapping = map[string]ErrorResponse{
-	StatusForbidden: {
-		Code:       StatusForbidden,
-		ErrMessage: errForbiddenMsg,
-		ErrReason:  errForbiddenReason,
+	StatusUnauthorized: {
+		Code:       StatusUnauthorized,
+		ErrMessage: errUnauthorizedMsg,
+		ErrReason:  errUnauthorizedReason,
 	},
 	StatusInvalidRequest: {
 		Code:       StatusInvalidRequest,
@@ -40,6 +43,11 @@ var errorMapping = map[string]ErrorResponse{
 		Code:       StatusAuthFailed,
 		ErrMessage: authFailedMsg,
 		ErrReason:  authFailedReason,
+	},
+	StatusVerificationFailed: {
+		Code:       StatusVerificationFailed,
+		ErrMessage: verifyFailedMsg,
+		ErrReason:  verifyFailedReason,
 	},
 	StatusTokenExpired: {
 		Code:       StatusTokenExpired,

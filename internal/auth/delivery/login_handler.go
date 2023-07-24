@@ -3,9 +3,9 @@ package delivery
 import (
 	"context"
 	"errors"
+	"github.com/Kora-Dance/koradance-backend/app/helper/http"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
-	"kora-backend/app/helper/http"
-	"kora-backend/internal/entity"
 	"time"
 )
 
@@ -21,7 +21,7 @@ func validateLoginParam(c *gin.Context) (*entity.LoginUserEntity, error) {
 	}, nil
 }
 
-func (api UserAuthHandler) authUserLoginHandler(c *gin.Context) {
+func (api UserAuthHandler) authUserLoginHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
 	defer cancel()
 

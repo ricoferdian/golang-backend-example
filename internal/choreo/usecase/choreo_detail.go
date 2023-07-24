@@ -2,10 +2,9 @@ package usecase
 
 import (
 	"context"
-	"errors"
+	"github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"golang.org/x/sync/errgroup"
-	"kora-backend/internal/choreo/helper"
-	"kora-backend/internal/entity"
 )
 
 func (c ChoreoUseCaseImpl) GetChoreoDetailByChoreoID(ctx context.Context, filter entity.ChoreoDetailFilterEntity) (choreoResult []entity.ChoreographyDetailEntity, err error) {
@@ -14,16 +13,17 @@ func (c ChoreoUseCaseImpl) GetChoreoDetailByChoreoID(ctx context.Context, filter
 		return choreoResult, err
 	}
 	isUnlocked := c.checkContentUnlockStatus(*parentChoreo)
-	if !isUnlocked {
-		return choreoResult, errors.New("choreo not unlocked yet")
-	}
 
 	choreoList, err := c.baseRepo.ChoreoRepository().GetChoreoDetailByChoreoID(ctx, filter)
 	if err != nil {
 		return choreoResult, err
 	}
 	for _, choreoData := range choreoList {
-		choreoResult = append(choreoResult, helper.ChoreoDetailToEntity(choreoData))
+		data := helper.ChoreoDetailToEntity(choreoData)
+		if !isUnlocked {
+			data.VideoURL = ""
+		}
+		choreoResult = append(choreoResult, data)
 	}
 	return choreoResult, nil
 }
@@ -73,16 +73,38 @@ func (c ChoreoUseCaseImpl) GetChoreoDetailByChoreoIDWithUserContent(ctx context.
 	isFree := <-isFreeCh
 	isPurchased := <-isPurchasedCh
 
-	if !isFree && !isPurchased {
-		return choreoResult, errors.New("choreo not unlocked yet")
-	}
-
 	choreoList, err := c.baseRepo.ChoreoRepository().GetChoreoDetailByChoreoID(ctx, filter)
 	if err != nil {
 		return choreoResult, err
 	}
 	for _, choreoData := range choreoList {
-		choreoResult = append(choreoResult, helper.ChoreoDetailToEntity(choreoData))
+		data := helper.ChoreoDetailToEntity(choreoData)
+		if !isFree && !isPurchased {
+			data.VideoURL = ""
+		}
+		choreoResult = append(choreoResult, data)
 	}
 	return choreoResult, nil
+}
+
+func (c ChoreoUseCaseImpl) InsertChoreoDetail(ctx context.Context, detail entity.ChoreographyDetailEntity) (result entity.ChoreographyDetailEntity, err error) {
+	choreoDetail := helper.ChoreoDetailEntityToModel(detail)
+	data, err := c.baseRepo.ChoreoRepository().InsertChoreoDetail(ctx, choreoDetail)
+	if err != nil {
+		return result, err
+	}
+	return helper.ChoreoDetailToEntity(data), nil
+}
+
+func (c ChoreoUseCaseImpl) UpdateChoreoDetail(ctx context.Context, detail entity.ChoreographyDetailEntity) (result entity.ChoreographyDetailEntity, err error) {
+	choreoDetail := helper.ChoreoDetailEntityToModel(detail)
+	_, err = c.baseRepo.ChoreoRepository().UpdateChoreoDetail(ctx, choreoDetail)
+	if err != nil {
+		return result, err
+	}
+	data, err := c.baseRepo.ChoreoRepository().GetChoreoDetailById(ctx, detail.ChoreoDetailID)
+	if err != nil {
+		return result, err
+	}
+	return helper.ChoreoDetailToEntity(*data), nil
 }

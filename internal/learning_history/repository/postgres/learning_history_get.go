@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
 	sq "github.com/huandu/go-sqlbuilder"
-	"kora-backend/internal/model"
 )
 
 func (c PostgresLearningHistoryRepository) GetLearningHistoryList(ctx context.Context, filter model.LearningHistoryFilter) (result []model.LearningHistoryModel, err error) {
@@ -36,7 +36,7 @@ func (c PostgresLearningHistoryRepository) buildGetLearningHistoryList(filter mo
 		sb.Where(sb.Equal("learning_history_id", filter.LearningHistoryID))
 	}
 	if filter.ChoreoDetailID != 0 {
-		sb.Where(sb.Equal("choreo_detail_id", filter.ChoreoDetailID))
+		sb.Where(sb.Equal("det_choreo_id", filter.ChoreoDetailID))
 	}
 	if filter.UserID != 0 {
 		sb.Where(sb.Equal("user_id", filter.UserID))

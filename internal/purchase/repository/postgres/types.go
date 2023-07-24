@@ -1,8 +1,8 @@
 package postgres
 
 import (
+	"github.com/Kora-Dance/koradance-backend/internal/domain/purchase"
 	"github.com/jmoiron/sqlx"
-	"kora-backend/internal/domain/purchase"
 )
 
 type PostgresChoreoPurchaseRepository struct {

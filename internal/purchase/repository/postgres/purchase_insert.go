@@ -2,25 +2,21 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/purchase/helper"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	sq "github.com/huandu/go-sqlbuilder"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
-	"kora-backend/internal/purchase/helper"
 )
 
 func (c PostgresChoreoPurchaseRepository) InsertPurchasedChoreo(ctx context.Context, purchaseData entity.ChoreoPurchaseEntity) (*model.ChoreoPurchaseModel, error) {
 	query, args := c.buildInsertLearningHistory(purchaseData)
-	historyId, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
+	purchaseID, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
 	if err != nil {
 		return nil, err
 	}
-	defer historyId.Close()
-	for historyId.Next() {
-		err = historyId.Scan(
+	defer purchaseID.Close()
+	for purchaseID.Next() {
+		err = purchaseID.Scan(
 			&purchaseData.ChoreoPurchaseID,
 		)
 		break

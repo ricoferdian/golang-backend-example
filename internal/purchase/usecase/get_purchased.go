@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"context"
+	choreoHelper "github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/purchase/helper"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"golang.org/x/sync/errgroup"
-	choreoHelper "kora-backend/internal/choreo/helper"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
-	"kora-backend/internal/purchase/helper"
 )
 
 func (c ChoreoPurchaseUseCaseImpl) GetPurchasedChoreo(ctx context.Context, userID int64) (resultEntity []entity.ChoreoPurchaseEntity, err error) {

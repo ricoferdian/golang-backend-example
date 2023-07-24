@@ -1,8 +1,8 @@
 package redis
 
 import (
+	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
 	"github.com/redis/go-redis/v9"
-	"kora-backend/internal/domain/learning_history"
 )
 
 type RedisLearningHistoryRepository struct {

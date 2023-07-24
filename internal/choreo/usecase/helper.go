@@ -1,6 +1,6 @@
 package usecase
 
-import "kora-backend/internal/model"
+import "github.com/Kora-Dance/koradance-backend/internal/model"
 
 func (c ChoreoUseCaseImpl) checkContentUnlockStatus(choreoData model.ChoreographyModel) bool {
 	// TODO remove after dynamic pricing implemented

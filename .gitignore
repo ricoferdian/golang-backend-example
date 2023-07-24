@@ -2,3 +2,5 @@
 .idea/
 /files/etc/config
 .DS_Store
+
+*.db

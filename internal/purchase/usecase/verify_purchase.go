@@ -4,17 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kora-backend/internal/common/constants"
-	"kora-backend/internal/common/storekit"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/purchase/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
+	"github.com/Kora-Dance/koradance-backend/internal/purchase/helper"
+	entity2 "github.com/Kora-Dance/koradance-backend/pkg/entity"
+	"github.com/Kora-Dance/koradance-backend/pkg/storekit"
 )
 
 const (
-	PrefixProductID = "com.nhara.kora"
+	PrefixProductID = "com.nhara.kora.product"
 )
 
-func (c ChoreoPurchaseUseCaseImpl) VerifyPurchaseChoreo(ctx context.Context, userID int64, paymentData entity.VerifyPaymentAppleIAPEntity) (*entity.ChoreoPurchaseEntity, error) {
+func (c ChoreoPurchaseUseCaseImpl) VerifyPurchaseChoreo(ctx context.Context, userID int64, paymentData entity2.VerifyPaymentAppleIAPEntity) (*entity2.ChoreoPurchaseEntity, error) {
 	// First, check if choreo already purchased
 	purchasedData, err := c.baseRepo.ChoreoPurchaseRepository().GetPurchasedChoreoByID(ctx, userID, paymentData.ChoreoID)
 	if err != nil {
@@ -39,7 +39,7 @@ func (c ChoreoPurchaseUseCaseImpl) VerifyPurchaseChoreo(ctx context.Context, use
 		return nil, errors.New("payment verification failed")
 	}
 
-	purchasedChoreo := entity.ChoreoPurchaseEntity{
+	purchasedChoreo := entity2.ChoreoPurchaseEntity{
 		UserID:   userID,
 		ChoreoID: paymentData.ChoreoID,
 		Receipt:  paymentData.ReceiptData,

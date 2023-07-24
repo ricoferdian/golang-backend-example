@@ -2,7 +2,7 @@ package redis
 
 import (
 	"github.com/redis/go-redis/v9"
-	"kora-backend/internal/domain/choreo"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/choreo"
 )
 
 type RedisChoreoRepository struct {

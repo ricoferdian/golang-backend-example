@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	sq "github.com/huandu/go-sqlbuilder"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
 )
 
 func (c PostgresChoreoPurchaseRepository) GetPurchasedChoreoByID(ctx context.Context, userID int64, choreoID int64) (result *model.ChoreoPurchaseModel, err error) {

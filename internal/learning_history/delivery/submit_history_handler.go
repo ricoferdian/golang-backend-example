@@ -2,10 +2,10 @@ package delivery
 
 import (
 	"context"
+	"github.com/Kora-Dance/koradance-backend/app/helper/http"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
 	validator "github.com/go-playground/validator/v10"
-	"kora-backend/app/helper/http"
-	"kora-backend/internal/entity"
 	"time"
 )
 
@@ -23,7 +23,7 @@ func validateSubmitParam(c *gin.Context) (*entity.SubmitLearningHistoryEntity, e
 	return &history, nil
 }
 
-func (api LearningHistoryHandler) submitHistoryHandler(c *gin.Context) {
+func (api LearningHistoryHandler) submitHistoryHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
 	defer cancel()
 

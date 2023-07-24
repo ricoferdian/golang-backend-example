@@ -2,19 +2,15 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+	"github.com/Kora-Dance/koradance-backend/internal/auth/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	sq "github.com/huandu/go-sqlbuilder"
-	"kora-backend/internal/auth/helper"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
 )
 
 func (c PostgresUserAuthRepository) InsertSingleUser(ctx context.Context, user entity.UserEntity) (*model.RbacUserModel, error) {
 	query, args := c.buildInsertSingleUser(user)
 	userId, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +36,7 @@ func (c PostgresUserAuthRepository) buildInsertSingleUser(user entity.UserEntity
 		user.FirstName,
 		user.LastName,
 		user.UserType,
+		user.PasslessIdentity,
 	)
 	addQ := sq.Buildf("%v RETURNING user_id", ib)
 

@@ -2,14 +2,14 @@ package helper
 
 import (
 	"database/sql"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	entity2 "github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
-func LearningHistoryModelToEntity(model model.LearningHistoryModel) entity.LearningHistoryEntity {
+func LearningHistoryModelToEntity(model model.LearningHistoryModel) entity2.LearningHistoryEntity {
 	// Entity will never need password when converted from model
 	// as the model comes from db, we shall not put password from db to entity
-	return entity.LearningHistoryEntity{
+	return entity2.LearningHistoryEntity{
 		LearningHistoryID: model.LearningHistoryID,
 		ChoreoDetailID:    model.ChoreoDetailID,
 		UserID:            model.UserID,
@@ -23,10 +23,10 @@ func LearningHistoryModelToEntity(model model.LearningHistoryModel) entity.Learn
 	}
 }
 
-func SubmitLearningHistoryModelToEntity(model model.SubmitLearningHistoryModel) entity.SubmitLearningHistoryEntity {
+func SubmitLearningHistoryModelToEntity(model model.SubmitLearningHistoryModel) entity2.SubmitLearningHistoryEntity {
 	// Entity will never need password when converted from model
 	// as the model comes from db, we shall not put password from db to entity
-	return entity.SubmitLearningHistoryEntity{
+	return entity2.SubmitLearningHistoryEntity{
 		LearningHistoryID: model.LearningHistoryID,
 		ChoreoDetailID:    model.ChoreoDetailID,
 		UserID:            model.UserID,
@@ -38,7 +38,7 @@ func SubmitLearningHistoryModelToEntity(model model.SubmitLearningHistoryModel) 
 	}
 }
 
-func SubmitLearningHistoryEntityToModel(entity entity.SubmitLearningHistoryEntity) model.SubmitLearningHistoryModel {
+func SubmitLearningHistoryEntityToModel(entity entity2.SubmitLearningHistoryEntity) model.SubmitLearningHistoryModel {
 	return model.SubmitLearningHistoryModel{
 		LearningHistoryID: entity.LearningHistoryID,
 		ChoreoDetailID:    entity.ChoreoDetailID,

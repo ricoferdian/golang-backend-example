@@ -2,8 +2,8 @@ package purchase
 
 import (
 	"context"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
 type ChoreoPurchaseDatabaseRepo interface {

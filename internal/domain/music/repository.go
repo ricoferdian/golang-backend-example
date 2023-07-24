@@ -2,7 +2,7 @@ package music
 
 import (
 	"context"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
 )
 
 type MusicDatabaseRepo interface {

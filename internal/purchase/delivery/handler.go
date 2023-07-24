@@ -1,6 +1,6 @@
 package delivery
 
-import "github.com/gin-gonic/gin"
+import "github.com/Kora-Dance/koradance-backend/internal/common/router"
 
 const (
 	basePath = "/kora/purchasedContent"
@@ -9,7 +9,7 @@ const (
 	verifyPurchasedContent = basePath + "/verify"
 )
 
-func (api ChoreoPurchaseHandler) RegisterPath(router *gin.Engine) {
+func (api ChoreoPurchaseHandler) RegisterPath(router router.KoraRouter) {
 	router.OPTIONS(getPurchasedContent, api.middlewareM.CORS())
 	router.GET(getPurchasedContent, api.middlewareM.AuthHandlerMiddleware(api.getPurchasedChoreoListHandler))
 

@@ -2,8 +2,8 @@ package helper
 
 import (
 	"database/sql"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
 func ChoreoPurchaseModelToEntity(model model.ChoreoPurchaseModel) entity.ChoreoPurchaseEntity {

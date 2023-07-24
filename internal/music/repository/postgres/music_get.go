@@ -6,7 +6,7 @@ import (
 	"errors"
 	sq "github.com/huandu/go-sqlbuilder"
 	"github.com/lib/pq"
-	"kora-backend/internal/model"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
 )
 
 func (c PostgresMusicRepository) GetMusicByIdsMap(ctx context.Context, musicIDs []int64) (map[int64]model.MusicModel, error) {

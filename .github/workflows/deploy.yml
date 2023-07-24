@@ -1,0 +1,9 @@
+# Trigger deployment only on push to production branch
+
+name: Deploy to EC2 instance
+
+on:
+  push:
+    branches:
+      - production
+

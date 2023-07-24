@@ -2,15 +2,15 @@ package delivery
 
 import (
 	"context"
+	"github.com/Kora-Dance/koradance-backend/app/helper/http"
+	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
+	entity2 "github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
-	"kora-backend/app/helper/http"
-	"kora-backend/internal/common/constants"
-	"kora-backend/internal/entity"
 	"strconv"
 	"time"
 )
 
-func (api ChoreoHandler) getChoreoDetailListHandler(c *gin.Context) {
+func (api ChoreoHandler) getChoreoDetailListHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
 	defer cancel()
 
@@ -20,7 +20,7 @@ func (api ChoreoHandler) getChoreoDetailListHandler(c *gin.Context) {
 		http.WriteErrorResponseByCode(c, startTime, http.StatusInvalidRequest)
 		return
 	}
-	filter := entity.ChoreoDetailFilterEntity{ChoreoID: int64(choreoId)}
+	filter := entity2.ChoreoDetailFilterEntity{ChoreoID: int64(choreoId)}
 	data, err := api.getChoreoDetailListWithOptionalAuth(c, ctx, filter)
 	if err != nil {
 		http.WriteErrorResponseByCode(c, startTime, http.StatusNotFound)
@@ -30,8 +30,8 @@ func (api ChoreoHandler) getChoreoDetailListHandler(c *gin.Context) {
 	return
 }
 
-func (api ChoreoHandler) getChoreoDetailListWithOptionalAuth(c *gin.Context, ctx context.Context, filter entity.ChoreoDetailFilterEntity) ([]entity.ChoreographyDetailEntity, error) {
-	authData, isOk := c.Value(constants.CtxAuthUserData).(*entity.AuthenticatedUserEntity)
+func (api ChoreoHandler) getChoreoDetailListWithOptionalAuth(c *gin.Context, ctx context.Context, filter entity2.ChoreoDetailFilterEntity) ([]entity2.ChoreographyDetailEntity, error) {
+	authData, isOk := c.Value(constants.CtxAuthUserData).(*entity2.AuthenticatedUserEntity)
 	if !isOk {
 		return api.choreoUC.GetChoreoDetailByChoreoID(ctx, filter)
 	}

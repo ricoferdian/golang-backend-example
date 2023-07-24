@@ -1,13 +1,14 @@
 package common
 
 import (
-	"kora-backend/app/helper"
-	"kora-backend/internal/domain/auth"
-	"kora-backend/internal/domain/choreo"
-	"kora-backend/internal/domain/choreographer"
-	"kora-backend/internal/domain/learning_history"
-	"kora-backend/internal/domain/music"
-	"kora-backend/internal/domain/purchase"
+	"github.com/Kora-Dance/koradance-backend/app/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/auth"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/choreo"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/choreographer"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/like_save"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/music"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/purchase"
 )
 
 type BaseRepository interface {
@@ -18,4 +19,5 @@ type BaseRepository interface {
 	LearningHistoryRepository() learning_history.LearningHistoryRepository
 	ChoreoPurchaseRepository() purchase.ChoreoPurchaseRepository
 	GetAppConfig() *helper.AppConfig
+	ChoreoLikeSaveRepository() like_save.LikeSaveRepository
 }

@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"kora-backend/internal/entity"
-	"kora-backend/internal/learning_history/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/learning_history/helper"
+	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
 func (c LearningHistoryUseCaseImpl) SubmitLearningHistory(ctx context.Context, submitEntity entity.SubmitLearningHistoryEntity) (*entity.SubmitLearningHistoryEntity, error) {

@@ -1,18 +1,19 @@
 package delivery
 
 import (
-	"kora-backend/app/helper"
-	"kora-backend/internal/domain/auth"
-	"kora-backend/internal/domain/common"
+	"github.com/Kora-Dance/koradance-backend/app/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/auth"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/common"
+	"github.com/Kora-Dance/koradance-backend/pkg/middleware"
 )
 
 type UserAuthHandler struct {
-	middlewareM common.MiddlewareInterface
+	middlewareM middleware.MiddlewareInterface
 	userAuthUC  auth.UserAuthUseCase
 	handlerCfg  *helper.HandlerConfig
 }
 
-func NewUserAuthHandler(middlewareM common.MiddlewareInterface, handlerCfg *helper.HandlerConfig, userAuthUC auth.UserAuthUseCase) common.APIPathProvider {
+func NewUserAuthHandler(middlewareM middleware.MiddlewareInterface, handlerCfg *helper.HandlerConfig, userAuthUC auth.UserAuthUseCase) common.APIPathProvider {
 	return &UserAuthHandler{
 		middlewareM: middlewareM,
 		userAuthUC:  userAuthUC,

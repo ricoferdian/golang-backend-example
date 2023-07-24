@@ -1,8 +1,6 @@
 package delivery
 
-import (
-	"github.com/gin-gonic/gin"
-)
+import "github.com/Kora-Dance/koradance-backend/internal/common/router"
 
 const (
 	basePath = "/kora/learnHistory"
@@ -11,7 +9,7 @@ const (
 	submitLearningHistory  = basePath + "/submit"
 )
 
-func (api LearningHistoryHandler) RegisterPath(router *gin.Engine) {
+func (api LearningHistoryHandler) RegisterPath(router router.KoraRouter) {
 	router.OPTIONS(getLearningHistoryList, api.middlewareM.CORS())
 	router.GET(getLearningHistoryList, api.middlewareM.AuthHandlerMiddleware(api.getHistoryListHandler))
 

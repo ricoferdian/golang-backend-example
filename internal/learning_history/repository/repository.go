@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"kora-backend/internal/domain/learning_history"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
 )
 
 type LearningHistoryRepositoryImpl struct {

@@ -5,8 +5,9 @@ import "database/sql"
 
 type RbacUserModel struct {
 	UserID                 int64          `db:"user_id"`
-	UserIdentity           string         `db:"user_identity"`
-	HashPasswordIdentifier string         `db:"password_identifier"`
+	UserIdentity           sql.NullString `db:"user_identity"`
+	PasslessIdentity       sql.NullString `db:"passless_identity"`
+	HashPasswordIdentifier sql.NullString `db:"password_identifier"`
 	FirstName              sql.NullString `db:"first_name"`
 	LastName               sql.NullString `db:"last_name"`
 	UserType               sql.NullInt16  `db:"user_type"`
