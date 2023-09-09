@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	"github.com/Kora-Dance/koradance-backend/internal/learning_history/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/internal/model"
 	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	sq "github.com/huandu/go-sqlbuilder"

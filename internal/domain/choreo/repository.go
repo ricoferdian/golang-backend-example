@@ -11,6 +11,8 @@ type ChoreoDatabaseRepo interface {
 	GetChoreoById(ctx context.Context, choreoID int64) (*model.ChoreographyModel, error)
 	GetChoreoList(ctx context.Context, filter entity.ChoreoFilterEntity) ([]model.ChoreographyModel, error)
 	GetChoreoByIdsMap(ctx context.Context, choreoIDs []int64) (map[int64]model.ChoreographyModel, error)
+	DeleteChoreoDetailByID(ctx context.Context, choreoID int64) error
+	DeleteChoreoByID(ctx context.Context, choreoID int64) error
 	// GetChoreoListWithMusicAndChoreographIds used to retrieve choreo list with list of music and choreographer id
 	//
 	// the list are unique

@@ -6,11 +6,18 @@ import (
 	entity2 "github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 
-func MusicModelToEntity(musicModel model.MusicModel) entity2.MusicEntity {
-	return entity2.MusicEntity{
-		MusicID:    musicModel.MusicID,
-		ArtistName: musicModel.ArtistName,
-		Title:      musicModel.Title,
+func ChoreographerEntityToModel(choreographer entity2.ChoreographerEntity) model.ChoreographerModel {
+	return model.ChoreographerModel{
+		ChoreographerID:   choreographer.ChoreographerID,
+		ChoreographerName: choreographer.ChoreographerName,
+		Description: sql.NullString{
+			String: choreographer.Description,
+			Valid:  true,
+		},
+		ProfileImageURL: sql.NullString{
+			String: choreographer.ProfileImageURL,
+			Valid:  true,
+		},
 	}
 }
 func ChoreographerModelToEntity(choreographer model.ChoreographerModel) entity2.ChoreographerEntity {

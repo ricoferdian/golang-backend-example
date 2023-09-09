@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
 	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
 	"github.com/Kora-Dance/koradance-backend/internal/common/general"
+	"github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/internal/model"
 	"io"
 )

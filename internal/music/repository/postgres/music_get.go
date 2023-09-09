@@ -4,10 +4,41 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/Kora-Dance/koradance-backend/internal/model"
 	sq "github.com/huandu/go-sqlbuilder"
 	"github.com/lib/pq"
-	"github.com/Kora-Dance/koradance-backend/internal/model"
 )
+
+func (c PostgresMusicRepository) GetAllMusic(ctx context.Context) ([]model.MusicModel, error) {
+	query, args := c.buildGetAllMusic()
+	rows, err := c.dbCli.QueryContext(ctx, c.dbCli.Rebind(query), args...)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var data []model.MusicModel
+	for rows.Next() {
+		musicData, err := c.scanMusicData(rows)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, musicData)
+	}
+
+	return data, nil
+}
+
+func (c PostgresMusicRepository) buildGetAllMusic() (string, []interface{}) {
+	sb := sq.NewSelectBuilder()
+	sb.Select(columnSelectAllMusic)
+	sb.From(tableMasterMusic)
+
+	return sb.Build()
+}
 
 func (c PostgresMusicRepository) GetMusicByIdsMap(ctx context.Context, musicIDs []int64) (map[int64]model.MusicModel, error) {
 	if len(musicIDs) == 0 {

@@ -24,6 +24,7 @@ import (
 	"github.com/Kora-Dance/koradance-backend/internal/domain/choreographer"
 	"github.com/Kora-Dance/koradance-backend/internal/domain/common"
 	"github.com/Kora-Dance/koradance-backend/internal/domain/learning_history"
+	"github.com/Kora-Dance/koradance-backend/internal/domain/music"
 	"github.com/Kora-Dance/koradance-backend/internal/domain/purchase"
 	delivery3 "github.com/Kora-Dance/koradance-backend/internal/learning_history/delivery"
 	repository6 "github.com/Kora-Dance/koradance-backend/internal/learning_history/repository"
@@ -32,8 +33,10 @@ import (
 	usecase3 "github.com/Kora-Dance/koradance-backend/internal/learning_history/usecase"
 	repository8 "github.com/Kora-Dance/koradance-backend/internal/like_save/repository"
 	postgres7 "github.com/Kora-Dance/koradance-backend/internal/like_save/repository/postgres"
+	delivery6 "github.com/Kora-Dance/koradance-backend/internal/music/delivery"
 	repository4 "github.com/Kora-Dance/koradance-backend/internal/music/repository"
 	postgres3 "github.com/Kora-Dance/koradance-backend/internal/music/repository/postgres"
+	usecase6 "github.com/Kora-Dance/koradance-backend/internal/music/usecase"
 	delivery4 "github.com/Kora-Dance/koradance-backend/internal/purchase/delivery"
 	repository7 "github.com/Kora-Dance/koradance-backend/internal/purchase/repository"
 	postgres6 "github.com/Kora-Dance/koradance-backend/internal/purchase/repository/postgres"
@@ -68,6 +71,7 @@ type AppUseCase struct {
 	learningHistoryUC learning_history.LearningHistoryUseCase
 	choreoPurchaseUC  purchase.ChoreoPurchaseUseCase
 	choreographerUC   choreographer.ChoreographerUseCase
+	musicUC           music.MusicUseCase
 }
 
 type AppHandler struct {
@@ -114,7 +118,7 @@ func InitAppModule(cfg *helper.AppConfig) (appModule *AppModule) {
 		log.Fatalf("Failed to init store kit module with err : %s\n", err.Error())
 	}
 	appModule.cryptoModule = cryptography.NewCryptographyModule()
-	appModule.middlewareM = middleware.NewMiddlewareModule(appModule.jwtModule)
+	appModule.middlewareM = middleware.NewMiddlewareModule(appModule.jwtModule, cfg.StaticToken)
 	appModule.dbCli = InitDBCLient(cfg.DBConf)
 	appModule.redisCli = InitRedisClient(cfg.RediConf)
 	appModule.waModule = whatsapp.NewWhatsappModule(cfg.DBConf, appModule.slackModule)
@@ -173,6 +177,7 @@ func InitHandler(useCase *AppUseCase, appModule *AppModule, config *helper.AppCo
 	appHandler.handlers = append(appHandler.handlers, delivery3.NewLearningHistoryHandler(appModule.middlewareM, config.HandlerConf, useCase.learningHistoryUC))
 	appHandler.handlers = append(appHandler.handlers, delivery4.NewChoreoPurchaseHandler(appModule.middlewareM, config.HandlerConf, useCase.choreoPurchaseUC))
 	appHandler.handlers = append(appHandler.handlers, delivery5.NewChoreographerHandler(appModule.middlewareM, config.HandlerConf, useCase.choreographerUC))
+	appHandler.handlers = append(appHandler.handlers, delivery6.NewMusicHandler(appModule.middlewareM, config.HandlerConf, useCase.musicUC))
 	return appHandler
 }
 
@@ -183,6 +188,7 @@ func InitAppUseCase(appRepo common.BaseRepository, appModule *AppModule) (appUC 
 	appUC.learningHistoryUC = usecase3.NewLearningHistoryUseCase(appRepo)
 	appUC.choreoPurchaseUC = usecase4.NewChoreoPurchaseUseCase(appRepo, appModule.storeKitModule)
 	appUC.choreographerUC = usecase5.NewChoreographerUseCase(appRepo)
+	appUC.musicUC = usecase6.NewMusicUseCase(appRepo)
 	return appUC
 }
 

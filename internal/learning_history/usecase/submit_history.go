@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"github.com/Kora-Dance/koradance-backend/internal/learning_history/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
 

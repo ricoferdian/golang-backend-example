@@ -2,9 +2,8 @@ package usecase
 
 import (
 	"context"
-	choreoHelper "github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
+	choreoHelper "github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/internal/model"
-	"github.com/Kora-Dance/koradance-backend/internal/purchase/helper"
 	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"golang.org/x/sync/errgroup"
 )
@@ -41,7 +40,7 @@ func (c ChoreoPurchaseUseCaseImpl) GetPurchasedChoreo(ctx context.Context, userI
 
 	choreoMap := <-choreoMapCh
 	for _, purchaseData := range purchasedList {
-		choreoPurchaseEntity := helper.ChoreoPurchaseModelToEntity(purchaseData)
+		choreoPurchaseEntity := choreoHelper.ChoreoPurchaseModelToEntity(purchaseData)
 
 		// Retrieve data from model
 		if data, ok := choreoMap[choreoPurchaseEntity.ChoreoID]; ok {

@@ -4,4 +4,5 @@ const (
 	tableMasterChoreographer = "m_choreographer"
 
 	columnSelectAllChoreographer = "choreographer_id,name,description,profile_image_url"
+	columnInsertChoreographer    = "name,description,profile_image_url"
 )

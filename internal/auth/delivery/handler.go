@@ -19,24 +19,24 @@ const (
 )
 
 func (api UserAuthHandler) RegisterPath(router router.KoraRouter) {
-	router.OPTIONS(authLogin, api.middlewareM.CORS())
+	router.OPTIONS(authLogin, api.middlewareM.CORS(nil))
 	router.POST(authLogin, api.authUserLoginHandler)
 
-	router.OPTIONS(authRegister, api.middlewareM.CORS())
+	router.OPTIONS(authRegister, api.middlewareM.CORS(nil))
 	router.POST(authRegister, api.authUserRegisterHandler)
 
-	router.OPTIONS(userProfile, api.middlewareM.CORS())
+	router.OPTIONS(userProfile, api.middlewareM.CORS(nil))
 	router.GET(userProfile, api.middlewareM.AuthHandlerMiddleware(api.userProfileHandler))
 
-	router.OPTIONS(otpRequest, api.middlewareM.CORS())
+	router.OPTIONS(otpRequest, api.middlewareM.CORS(nil))
 	router.POST(otpRequest, api.requestOtpHandler)
 
-	router.OPTIONS(otpValidate, api.middlewareM.CORS())
+	router.OPTIONS(otpValidate, api.middlewareM.CORS(nil))
 	router.POST(otpValidate, api.authOtpHandler)
 
-	router.OPTIONS(userDeactivate, api.middlewareM.CORS())
+	router.OPTIONS(userDeactivate, api.middlewareM.CORS(nil))
 	router.GET(userDeactivate, api.middlewareM.AuthHandlerMiddleware(api.deactivateUserHandler))
 
-	router.OPTIONS(userReactivate, api.middlewareM.CORS())
+	router.OPTIONS(userReactivate, api.middlewareM.CORS(nil))
 	router.GET(userReactivate, api.middlewareM.AuthHandlerMiddleware(api.reactivateUserHandler))
 }

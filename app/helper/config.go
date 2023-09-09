@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
@@ -17,6 +18,7 @@ type AppConfig struct {
 	StoreKitVerifyConfig *StoreKitVerifyConfig `yaml:"storekit_verify"`
 	SecureOtpConfig      *SecureOtpConfig      `yaml:"secure_otp"`
 	AWSConfig            *AWSConfig            `yaml:"aws"`
+	StaticToken          *StaticTokenAuth      `yaml:"static_token"`
 }
 
 type JWTConfig struct {
@@ -81,6 +83,19 @@ type S3BucketConfig struct {
 
 type KoraContentS3Config struct {
 	Path string `yaml:"path"`
+}
+
+type StaticTokenAuth struct {
+	BackofficeToken string `yaml:"backoffice_token"`
+}
+
+func (t *StaticTokenAuth) GetToken(key string) string {
+	switch key {
+	case constants.BackOfficeStatic:
+		return t.BackofficeToken
+	default:
+		return ""
+	}
 }
 
 func InitConfig(appName string) (config *AppConfig) {

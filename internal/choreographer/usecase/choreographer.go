@@ -3,9 +3,19 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 )
+
+func (c ChoreographerUseCaseImpl) UpsertChoreographer(ctx context.Context, choreographerData entity.ChoreographerEntity) (entity.ChoreographerEntity, error) {
+	choreographerModel := helper.ChoreographerEntityToModel(choreographerData)
+	choreographerResult, err := c.baseRepo.ChoreographerRepository().UpsertChoreographerByIds(ctx, choreographerModel)
+	if err != nil || choreographerResult == nil {
+		return choreographerData, err
+	}
+	choreographerData = helper.ChoreographerModelToEntity(*choreographerResult)
+	return choreographerData, nil
+}
 
 func (c ChoreographerUseCaseImpl) GetChoreographerList(ctx context.Context) ([]entity.ChoreographerEntity, error) {
 	choreographerList, err := c.baseRepo.ChoreographerRepository().GetChoreographerList(ctx)
@@ -30,4 +40,12 @@ func (c ChoreographerUseCaseImpl) GetChoreographerByID(ctx context.Context, filt
 	}
 	result := helper.ChoreographerModelToEntity(*choreographerData)
 	return &result, nil
+}
+
+func (m ChoreographerUseCaseImpl) DeleteChoreographerByID(ctx context.Context, choreographerID int64) error {
+	err := m.baseRepo.ChoreographerRepository().DeleteChoreographerByID(ctx, choreographerID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

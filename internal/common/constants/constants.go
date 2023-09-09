@@ -15,4 +15,6 @@ const (
 	FileCategoryThumbnailImage = 1
 	FileCategoryVideo          = 2
 	FileCategoryTestVideo      = 3
+
+	BackOfficeStatic = "backoffice"
 )

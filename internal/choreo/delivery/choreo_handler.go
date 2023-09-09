@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/Kora-Dance/koradance-backend/app/helper/http"
 	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
+	"github.com/Kora-Dance/koradance-backend/internal/common/handler"
 	entity2 "github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -255,4 +256,12 @@ func (api ChoreoHandler) updateChoreoHandler(c *gin.Context) (metricsData interf
 
 func (api ChoreoHandler) updateChoreoDetailHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
 	return api.upsertChoreoDetailHandler(c, api.choreoUC.UpdateChoreoDetail)
+}
+
+func (api ChoreoHandler) deleteChoreoByID(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
+	return handler.GenericDeleteHandler(c, api.handlerCfg.Timeout, "choreo_id", api.choreoUC.DeleteChoreoByID)
+}
+
+func (api ChoreoHandler) deleteChoreoDetailByID(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
+	return handler.GenericDeleteHandler(c, api.handlerCfg.Timeout, "choreo_detail_id", api.choreoUC.DeleteChoreoDetailByID)
 }

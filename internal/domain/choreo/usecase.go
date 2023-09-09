@@ -19,4 +19,6 @@ type ChoreoUseCase interface {
 	InsertChoreoDetail(ctx context.Context, detail entity2.ChoreographyDetailEntity) (result entity2.ChoreographyDetailEntity, err error)
 	UpdateChoreo(ctx context.Context, choreo entity2.ChoreographyEntity) (result entity2.ChoreographyEntity, err error)
 	UpdateChoreoDetail(ctx context.Context, detail entity2.ChoreographyDetailEntity) (result entity2.ChoreographyDetailEntity, err error)
+	DeleteChoreoDetailByID(ctx context.Context, choreoDetailID int64) error
+	DeleteChoreoByID(ctx context.Context, choreoID int64) error
 }

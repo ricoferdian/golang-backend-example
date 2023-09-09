@@ -2,9 +2,10 @@ package usecase
 
 import (
 	"context"
-	"github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"golang.org/x/sync/errgroup"
+	"log"
 )
 
 func (c ChoreoUseCaseImpl) GetChoreoDetailByChoreoID(ctx context.Context, filter entity.ChoreoDetailFilterEntity) (choreoResult []entity.ChoreographyDetailEntity, err error) {
@@ -106,5 +107,13 @@ func (c ChoreoUseCaseImpl) UpdateChoreoDetail(ctx context.Context, detail entity
 	if err != nil {
 		return result, err
 	}
+	if data == nil {
+		log.Print("[ChoreoUseCaseImpl] nil choreo detail id")
+		return result, nil
+	}
 	return helper.ChoreoDetailToEntity(*data), nil
+}
+
+func (c ChoreoUseCaseImpl) DeleteChoreoDetailByID(ctx context.Context, choreoDetailID int64) error {
+	return c.baseRepo.ChoreoRepository().DeleteChoreoDetailByID(ctx, choreoDetailID)
 }

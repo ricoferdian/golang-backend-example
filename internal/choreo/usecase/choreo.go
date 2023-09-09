@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github.com/Kora-Dance/koradance-backend/internal/choreo/helper"
+	"github.com/Kora-Dance/koradance-backend/internal/helper"
 	"github.com/Kora-Dance/koradance-backend/internal/model"
 	"github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"golang.org/x/sync/errgroup"
@@ -464,4 +464,8 @@ func (c ChoreoUseCaseImpl) UpdateChoreo(ctx context.Context, choreo entity.Chore
 		return result, err
 	}
 	return helper.ChoreoModelToEntity(*data), nil
+}
+
+func (c ChoreoUseCaseImpl) DeleteChoreoByID(ctx context.Context, choreoID int64) error {
+	return c.baseRepo.ChoreoRepository().DeleteChoreoByID(ctx, choreoID)
 }

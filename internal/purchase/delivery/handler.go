@@ -10,9 +10,9 @@ const (
 )
 
 func (api ChoreoPurchaseHandler) RegisterPath(router router.KoraRouter) {
-	router.OPTIONS(getPurchasedContent, api.middlewareM.CORS())
+	router.OPTIONS(getPurchasedContent, api.middlewareM.CORS(nil))
 	router.GET(getPurchasedContent, api.middlewareM.AuthHandlerMiddleware(api.getPurchasedChoreoListHandler))
 
-	router.OPTIONS(verifyPurchasedContent, api.middlewareM.CORS())
+	router.OPTIONS(verifyPurchasedContent, api.middlewareM.CORS(nil))
 	router.POST(verifyPurchasedContent, api.middlewareM.AuthHandlerMiddleware(api.verifyPurchaseHandler))
 }

@@ -13,6 +13,7 @@ func (s S3Module) UploadFile(bucketName string, fileName string, fileReader io.R
 		Key:    aws.String(fileName),
 		Body:   fileReader,
 	})
+	
 	if err != nil {
 		return err
 	}
