@@ -8,10 +8,11 @@ import (
 const (
 	basePath = "/kora/choreographer"
 
-	getChoreographerList    = basePath + "/getList"
-	getChoreographerDetail  = basePath + "/getDetail"
-	upsertChoreographerData = basePath + "/upsert"
-	deleteChoreographerData = basePath + "/delete"
+	getChoreographerList       = basePath + "/getList"
+	getChoreographerDetail     = basePath + "/getDetail"
+	upsertChoreographerData    = basePath + "/upsert"
+	deleteChoreographerData    = basePath + "/delete"
+	uploadChoreographerContent = basePath + "/file"
 )
 
 func (api ChoreographerHandler) RegisterPath(router router.KoraRouter) {
@@ -26,4 +27,7 @@ func (api ChoreographerHandler) RegisterPath(router router.KoraRouter) {
 
 	router.OPTIONS(deleteChoreographerData, api.middlewareM.CORS(nil))
 	router.DELETE(deleteChoreographerData, api.middlewareM.InternalToolMiddleware(api.deleteChoreographerByID, constants.BackOfficeStatic))
+
+	router.OPTIONS(uploadChoreographerContent, api.middlewareM.CORS(nil))
+	router.POST(uploadChoreographerContent, api.middlewareM.InternalToolMiddleware(api.uploadChoreographerContent, constants.BackOfficeStatic))
 }

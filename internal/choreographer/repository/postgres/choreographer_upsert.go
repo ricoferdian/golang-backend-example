@@ -47,7 +47,7 @@ func (c PostgresChoreographerRepository) buildUpdateChoreographer(choreographerD
 	ub := sq.NewUpdateBuilder()
 	ub.Update(tableMasterChoreographer)
 	if choreographerData.ChoreographerName != "" {
-		ub.SetMore(ub.Assign("choreographer_name", choreographerData.ChoreographerName))
+		ub.SetMore(ub.Assign("name", choreographerData.ChoreographerName))
 	}
 	if choreographerData.Description.String != "" {
 		ub.SetMore(ub.Assign("description", choreographerData.Description))

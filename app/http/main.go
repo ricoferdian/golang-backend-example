@@ -17,6 +17,7 @@ import (
 	delivery5 "github.com/Kora-Dance/koradance-backend/internal/choreographer/delivery"
 	repository5 "github.com/Kora-Dance/koradance-backend/internal/choreographer/repository"
 	postgres4 "github.com/Kora-Dance/koradance-backend/internal/choreographer/repository/postgres"
+	s32 "github.com/Kora-Dance/koradance-backend/internal/choreographer/repository/s3"
 	usecase5 "github.com/Kora-Dance/koradance-backend/internal/choreographer/usecase"
 	"github.com/Kora-Dance/koradance-backend/internal/common/router"
 	"github.com/Kora-Dance/koradance-backend/internal/domain/auth"
@@ -142,7 +143,8 @@ func InitRepository(module *AppModule, config *helper.AppConfig) (appRepo common
 
 	// Init choreographer repo
 	choreographPostgresRepo := postgres4.NewPostgresChoreographerRepository(module.dbCli)
-	choreographRepo := repository5.NewChoreographerRepository(choreographPostgresRepo, nil)
+	choreographerS3Repo := s32.NewS3ChoreographerContentRepository(module.awsM, config.AWSConfig.S3Config)
+	choreographRepo := repository5.NewChoreographerRepository(choreographPostgresRepo, nil, choreographerS3Repo)
 
 	// Init choreo repo
 	choreoPostgresrepo := postgres2.NewPostgresChoreoRepository(module.dbCli)

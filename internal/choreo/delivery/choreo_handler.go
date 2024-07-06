@@ -3,30 +3,14 @@ package delivery
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"github.com/Kora-Dance/koradance-backend/app/helper/http"
 	"github.com/Kora-Dance/koradance-backend/internal/common/constants"
 	"github.com/Kora-Dance/koradance-backend/internal/common/handler"
 	entity2 "github.com/Kora-Dance/koradance-backend/pkg/entity"
 	"github.com/gin-gonic/gin"
-	"io"
 	"log"
 	"strconv"
 	"time"
-)
-
-var (
-	TypeChoreo       = 1
-	TypeChoreoDetail = 2
-
-	mapPrimaryKey = map[int]string{
-		TypeChoreo:       "choreo_id",
-		TypeChoreoDetail: "choreo_detail_id",
-	}
-	mapFileCategory = map[int][]int{
-		TypeChoreo:       {constants.FileCategoryThumbnailImage, constants.FileCategoryVideo},
-		TypeChoreoDetail: {constants.FileCategoryThumbnailImage, constants.FileCategoryVideo, constants.FileCategoryTestVideo},
-	}
 )
 
 func (api ChoreoHandler) getChoreoListHandler(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
@@ -101,70 +85,12 @@ func (api ChoreoHandler) getChoreoByIDWithOptionalAuth(c *gin.Context, ctx conte
 	return api.choreoUC.GetChoreoByIDWithUserContent(ctx, authData.UserID, choreoID)
 }
 
-func (api ChoreoHandler) getFile(c *gin.Context) (io.Reader, string, error) {
-	file, header, err := c.Request.FormFile("file")
-	if err != nil {
-		return nil, "", err
-	}
-	filename := header.Filename
-
-	return file, filename, err
-}
-
-func validateFileCategory(key int, fileCategory int) error {
-	for _, category := range mapFileCategory[key] {
-		if category == fileCategory {
-			return nil
-		}
-	}
-	return errors.New("invalid file category")
-}
-
-func (api ChoreoHandler) choreoFileUploadHandler(c *gin.Context, key int, handle func(ctx context.Context, choreoID int64, fileCategory int, fileName string, fileReader io.Reader) (interface{}, error)) (metricsData interface{}, metricsErr error, metricsTags []string) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Millisecond*time.Duration(api.handlerCfg.Timeout))
-	defer cancel()
-
-	startTime := time.Now()
-
-	file, filename, err := api.getFile(c)
-	if err != nil {
-		http.WriteErrorResponseByCode(c, startTime, http.StatusInvalidRequest)
-		return
-	}
-	choreoID, err := strconv.Atoi(c.Request.URL.Query().Get(mapPrimaryKey[key]))
-	if err != nil {
-		http.WriteErrorResponseByCode(c, startTime, http.StatusInvalidRequest)
-		return
-	}
-	fileCategory, err := strconv.Atoi(c.Request.URL.Query().Get("file_category"))
-	if choreoID == 0 || fileCategory == 0 || err != nil {
-		http.WriteErrorResponseByCode(c, startTime, http.StatusInvalidRequest)
-		return
-	}
-	err = validateFileCategory(key, fileCategory)
-	if err != nil {
-		http.WriteErrorResponseByCode(c, startTime, http.StatusInvalidRequest)
-		return
-	}
-	data, err := handle(ctx, int64(choreoID), fileCategory, filename, file)
-	if err != nil {
-		http.WriteErrorResponseObj(c, startTime, http.StatusServerError, http.ErrorResponse{
-			Code:       http.StatusServerError,
-			ErrMessage: err.Error(),
-			ErrReason:  err.Error(),
-		})
-		return
-	}
-	http.WriteSuccessResponse(c, startTime, data)
-	return
-}
-
 func (api ChoreoHandler) uploadChoreoContent(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
-	return api.choreoFileUploadHandler(c, TypeChoreo, api.choreoUC.UploadChoreoContent)
+	return handler.GenericFileUploadHandler(c, handler.TypeChoreo, api.handlerCfg.Timeout, api.choreoUC.UploadChoreoContent)
 }
 
 func (api ChoreoHandler) uploadChoreoDetailContent(c *gin.Context) (metricsData interface{}, metricsErr error, metricsTags []string) {
-	return api.choreoFileUploadHandler(c, TypeChoreoDetail, api.choreoUC.UploadChoreoDetailContent)
+	return handler.GenericFileUploadHandler(c, handler.TypeChoreoDetail, api.handlerCfg.Timeout, api.choreoUC.UploadChoreoDetailContent)
 }
 
 func (api ChoreoHandler) getChoreoDataReq(c *gin.Context) (choreoData entity2.ChoreographyEntity, err error) {
